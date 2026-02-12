@@ -1,0 +1,130 @@
+<div class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+        <thead class="bg-success/10 text-gray-700 text-sm">
+            <tr>
+                <th class="py-4 pl-6 text-left">รหัสนักศึกษา</th>
+                <th class="py-4 text-left">ชื่อ-สกุล</th>
+                <th class="py-4 text-center">ปีการศึกษา</th>
+                <th class="py-4 text-center">สถานะปัจจุบัน</th>
+                <th class="py-4 text-center">ดำเนินการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr class="hover border-b border-base-200 transition-colors">
+                <td class="pl-6 font-mono font-bold text-primary">
+                    {{ s.student_code }}
+                </td>
+
+                <td>
+                    <div class="flex items-center gap-3">
+                        <div class="font-medium text-gray-700">
+                            {{ s.user.get_full_name }}
+                        </div>
+                    </div>
+                </td>
+
+                <td class="text-center font-medium text-gray-600">
+                    {{ s.display_year|default:"-" }}
+                </td>
+
+                <td class="text-center">
+                    {% if s.job_status == 'COMPLETED' %}
+                        <div class="badge badge-success text-white gap-1 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                            ฝึกงานเสร็จสิ้น
+                        </div>
+                    {% elif s.job_status == 'APPROVED' %}
+                        <div class="badge badge-info text-white gap-1 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            กำลังฝึกงาน
+                        </div>
+                    {% elif s.job_status == 'PENDING' %}
+                        <div class="badge badge-warning text-white gap-1 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            รออนุมัติฝึกงาน
+                        </div>
+                    {% else %}
+                        <div class="badge badge-accent text-white gap-1 shadow-sm">
+                        {% if s.training_hours >= 30 %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                อบรมครบ ({{ s.training_hours }} ชม.)
+                        {% else %}
+                                📚 กำลังอบรม ({{ s.training_hours }}/30)
+                        {% endif %}
+                        </div>
+                    {% endif %}
+                </td>
+
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline text-primary hover:bg-primary hover:text-white transition-all gap-2" 
+                            hx-get="{% url 'get-student-detail-modal' s.id %}"
+                            hx-target="#modal-container"
+                            hx-swap="innerHTML">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        ดูข้อมูล
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-10 text-gray-400 bg-base-100/50">
+                    <div class="flex flex-col items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>ไม่พบข้อมูลนักศึกษา</span>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="p-4 flex flex-col sm:flex-row justify-between items-center border-t border-base-200 bg-base-50 gap-4">
+    
+    <div class="text-xs text-gray-500">
+        แสดง {{ page_obj.start_index }} - {{ page_obj.end_index }} จาก {{ page_obj.paginator.count }} รายการ
+    </div>
+
+    <div class="join shadow-sm">
+        
+        {% if page_obj.has_previous %}
+            <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300" 
+                    hx-get="{% url 'teacher-dashboard' %}?page={{ page_obj.previous_page_number }}&q={{ search_query }}&year={{ year_filter }}" 
+                    hx-target="#student-results">
+                «
+            </button>
+        {% else %}
+            <button class="join-item btn btn-sm btn-outline btn-disabled bg-base-100 border-base-200">«</button>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <button class="join-item btn btn-sm btn-active btn-primary text-white border-primary pointer-events-none">
+                    {{ num }}
+                </button>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300 text-gray-600"
+                        hx-get="{% url 'teacher-dashboard' %}?page={{ num }}&q={{ search_query }}&year={{ year_filter }}"
+                        hx-target="#student-results">
+                    {{ num }}
+                </button>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300" 
+                    hx-get="{% url 'teacher-dashboard' %}?page={{ page_obj.next_page_number }}&q={{ search_query }}&year={{ year_filter }}" 
+                    hx-target="#student-results">
+                »
+            </button>
+        {% else %}
+            <button class="join-item btn btn-sm btn-outline btn-disabled bg-base-100 border-base-200">»</button>
+        {% endif %}
+        
+    </div>
+</div>
+{% endif %}

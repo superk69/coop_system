@@ -1,0 +1,18 @@
+{% if companies %}
+<ul class="menu bg-base-100 w-full rounded-box shadow-xl border border-base-200 p-2">
+    {% for c in companies %}
+    <li>
+        <a onclick="selectCompany('{{ c.id }}', '{{ c.name }}', '{{ c.address|escapejs }}')">
+            <div>
+                <div class="font-bold">{{ c.name }}</div>
+                <div class="text-xs text-gray-500 truncate">{{ c.address }}</div>
+            </div>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<div class="p-3 bg-base-100 shadow-xl border border-base-200 rounded-box text-center text-sm text-gray-500">
+    ไม่พบรายชื่อ (สามารถพิมพ์ชื่อใหม่เพื่อเพิ่มได้)
+</div>
+{% endif %}

@@ -1,0 +1,66 @@
+{% extends "base_teacher.html" %}
+{% load static %}
+
+{% block title %}Teacher - จัดการบัญชีบริษัท{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+            จัดการ <span class="text-primary">บัญชีผู้ประเมิน</span>
+        </h1>
+        <p class="text-gray-500 mt-2 text-base">สร้างบัญชีใหม่สำหรับการประเมิน</p>
+    </div>
+    <div class="hidden lg:flex items-center gap-4 bg-white py-2 px-6 rounded-full shadow-sm border border-base-200">
+        <div class="text-right">
+            <div class="font-bold text-gray-700 text-sm">{{ user.get_full_name }}</div>
+            <div class="text-xs text-gray-400 font-mono">{{ user.username }}</div>
+        </div>
+        <div class="avatar online placeholder">
+            <div class="bg-primary text-primary-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
+                <span class="text-lg font-bold">{{ user.first_name.0 }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    
+    <div class="flex flex-wrap gap-2">
+        <button class="btn btn-warning text-white shadow-md gap-2"
+                hx-post="{% url 'auto-gen-accounts' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-confirm="ระบบจะสร้างบัญชีให้บริษัทที่มีนักศึกษาฝึกงานในปีนี้ (ที่ยังไม่มีบัญชี) โดยอัตโนมัติ ยืนยันหรือไม่?">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            สร้างบัญชีรวม (Auto)
+        </button>
+
+        <button class="btn btn-primary text-white shadow-md gap-2"
+                hx-get="{% url 'get-account-modal' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            สร้างบัญชีใหม่
+        </button>
+    </div>
+</div>
+
+<div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card-body p-0">
+        
+        <div class="p-4 border-b border-info/20 bg-info/5 flex justify-between items-center rounded-t-xl">
+            <h3 class="font-bold text-gray-700 flex items-center gap-2">
+                📋 รายชื่อบัญชีในระบบ
+            </h3>
+        </div>
+
+        <div id="account-list-container" class="overflow-x-auto p-0">
+            {% include 'teacher/partials/company_account_list.html' %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

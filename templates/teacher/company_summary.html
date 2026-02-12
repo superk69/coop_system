@@ -1,0 +1,55 @@
+{% extends "base_teacher.html" %}
+{% load static %}
+
+{% block title %}สรุปข้อมูลสถานประกอบการ{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                สรุปข้อมูล <span class="text-primary">สถานประกอบการ</span>
+            </h1>
+            <p class="text-gray-500 mt-2 text-base">รายชื่อสถานประกอบการทั้งหมดและจำนวนนักศึกษาที่เข้าฝึกงาน</p>
+        </div>
+        <div class="hidden lg:flex items-center gap-4 bg-white py-2 px-6 rounded-full shadow-sm border border-base-200">
+            <div class="text-right">
+                <div class="font-bold text-gray-700 text-sm">{{ user.get_full_name }}</div>
+                <div class="text-xs text-gray-400 font-mono">{{ user.username }}</div>
+            </div>
+            <div class="avatar online placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <span class="text-lg font-bold">{{ user.first_name.0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-lg mb-6">
+        <div class="card-body p-4 md:p-6">
+            <form class="flex flex-col md:flex-row gap-4 items-end md:items-center justify-between"
+                  hx-get="{% url 'teacher-company-summary' %}" 
+                  hx-target="#company-list-container"
+                  hx-trigger="change from:select, keyup delay:500ms from:input">
+                
+                <div class="flex flex-col md:flex-row gap-4 w-full">
+                    <div class="form-control w-full md:w-96">
+                        <label class="label py-1"><span class="label-text font-bold">ค้นหาสถานประกอบการ</span></label>
+                        <div class="relative">
+                            <input type="text" name="q" placeholder="ชื่อบริษัท, ที่อยู่..." 
+                                   class="input input-bordered w-full pl-10 focus:input-primary" 
+                                   value="{{ request.GET.q }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                    </div>
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="company-list-container" class="bg-base-100 rounded-xl shadow-lg border border-base-200 overflow-hidden min-h-[400px]">
+        {% include "teacher/partials/company_summary_list.html" %}
+    </div>
+
+{% endblock %}

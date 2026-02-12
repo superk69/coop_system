@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}สมัครงานสหกิจ{% endblock %}
+
+{% block content %}
+<div class="space-y-6 fade-in">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-base-200 pb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                ยื่นใบสมัครงานสหกิจ
+            </h1>
+            <p class="text-gray-500 mt-2 text-base">สมัคร หรือตรวจสอบสถานะใบสมัคร</p>
+        </div>
+        <div class="hidden lg:flex items-center gap-4 bg-white py-2 px-6 rounded-full shadow-sm border border-base-200">
+            <div class="text-right">
+                <div class="font-bold text-gray-700 text-sm">{{ user.get_full_name }}</div>
+                <div class="text-xs text-gray-400 font-mono">{{ user.username }}</div>
+            </div>
+            <div class="avatar online placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <span class="text-lg font-bold">{{ user.first_name.0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% if active_job and active_job.status != 'REJECTED' and active_job.status != 'CANCELLED' %}
+        
+    <div class="card bg-base-100 shadow-xl border border-base-200 overflow-hidden relative">
+        <div class="absolute top-0 left-0 w-full h-2 {% if active_job.status == 'APPROVED' %}bg-success{% else %}bg-warning{% endif %}"></div>
+        
+        <div class="card-body p-8 md:p-10">
+            <div class="flex flex-col md:flex-row gap-8 items-start md:items-center">
+                
+                <div class="flex-shrink-0">
+                    {% if active_job.status == 'APPROVED' or active_job.status == 'COMPLETED' %}
+                        <div class="w-24 h-24 rounded-full bg-success/10 flex items-center justify-center text-success mx-auto md:mx-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                    {% else %}
+                        <div class="w-24 h-24 rounded-full bg-warning/10 flex items-center justify-center text-warning mx-auto md:mx-0 animate-pulse">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="flex-1 text-center md:text-left space-y-2">
+                    <div class="flex flex-col md:flex-row md:items-center gap-3 justify-center md:justify-start">
+                        <h2 class="text-3xl font-bold text-gray-800">{{ active_job.company }}</h2>
+                        {% if active_job.status == 'APPROVED' or active_job.status == 'COMPLETED' %}
+                            <span class="badge badge-success text-white badge-lg gap-1 shadow-sm">
+                                อนุมัติแล้ว
+                            </span>
+                        {% else %}
+                            <span class="badge badge-warning text-white badge-lg gap-1 shadow-sm">
+                                รอการอนุมัติ
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-xl text-gray-600 font-medium">
+                        ตำแหน่ง: <span class="text-primary">{{ active_job.position }}</span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-4 justify-center md:justify-start mt-4 text-sm text-gray-500">
+                        <div class="flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            {{ active_job.location|default:"ไม่ระบุที่อยู่" }}
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            ยื่นเมื่อ: {{ active_job.created_at|date:"d M Y" }}
+                        </div>
+                    </div>
+                </div>
+            {% if active_job.status == 'PENDING' or active_job.status == 'APPROVED' %}
+                <div class=" p-2 flex flex-col md:flex-row gap-8 items-center justify-end ">
+                    <button class="btn btn-outline btn-error btn-sm gap-2 hover:shadow-md"
+                            hx-get="{% url 'get-cancel-job-modal' active_job.id %}"
+                            hx-target="#modal_container">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        ขอยกเลิก/สละสิทธิ์
+                    </button>                    
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bg-base-50 p-4 text-center text-xs text-gray-400 border-t border-base-200">
+            Job Application ID: #{{ active_job.id }} &bull; หากต้องการแก้ไขข้อมูล กรุณายกเลิกและสมัครใหม่
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-1 space-y-4">
+            <div class="card bg-primary/5 border border-primary/20 shadow-sm">
+                <div class="card-body">
+                    <h3 class="font-bold text-primary flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        คำแนะนำ
+                    </h3>
+                    <ul class="list-disc list-outside ml-4 text-sm text-gray-600 space-y-2 mt-2">
+                        <li>ค้นหาชื่อบริษัทในฐานข้อมูลก่อน หากมีอยู่แล้วระบบจะเติมที่อยู่ให้</li>
+                        <li>หากเป็นบริษัทใหม่ ให้กรอกชื่อและที่อยู่ให้ครบถ้วน</li>
+                        <li>ตรวจสอบตำแหน่งงานให้ถูกต้อง</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2">
+            <div class="card bg-base-100 shadow-xl border border-base-200">
+                <div class="card-body">
+                    <form method="post" action="{% url 'student-job' %}" class="space-y-6">
+                        {% csrf_token %}
+
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="badge badge-primary badge-md">1</span> ข้อมูลสถานประกอบการ
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 gap-4">
+                                <div class="form-control relative">
+                                    <label class="label">
+                                        <span class="label-text font-bold">ค้นหาชื่อบริษัท <span class="text-error">*</span></span>
+                                    </label>
+                                    
+                                    <input type="text" 
+                                        name="company_search" 
+                                        class="input input-bordered w-full" 
+                                        placeholder="พิมพ์ชื่อบริษัทเพื่อค้นหา..." 
+                                        autocomplete="off"
+                                        hx-get="{% url 'search-company' %}" 
+                                        hx-trigger="keyup changed delay:500ms" 
+                                        hx-target="#company-results" 
+                                        required />
+                                    
+                                    <input type="hidden" name="company">
+
+                                    <div id="company-results" class="background-white absolute top-full left-0 w-full z-50 mt-1"></div>
+                                    
+                                    <label class="label">
+                                        <span class="label-text-alt text-gray-400">หากไม่พบในรายชื่อ สามารถพิมพ์ชื่อใหม่เพื่อเพิ่มได้เลย</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-bold">ที่ตั้งสถานประกอบการ</span>
+                                    </label>
+                                    {{ form.location }} 
+                                    {% if form.location.errors %}
+                                    <span class="text-error text-sm">{{ form.location.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="badge badge-primary badge-md">2</span> รายละเอียดงาน
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control md:col-span-2">
+                                    <label class="label">
+                                        <span class="label-text font-bold">ตำแหน่งงาน (Position) <span class="text-error">*</span></span>
+                                    </label>
+                                    {{ form.position }} {% if form.position.errors %}
+                                    <span class="text-error text-sm">{{ form.position.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-bold">วันที่เริ่มงาน <span class="text-error">*</span></span>
+                                    </label>
+                                    {{ form.start_date }} {% if form.start_date.errors %}
+                                    <span class="text-error text-sm">{{ form.start_date.errors.0 }}</span>
+                                    {% endif %} 
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-bold">วันที่สิ้นสุด <span class="text-error">*</span></span>
+                                    </label>
+                                    {{ form.end_date }} {% if form.end_date.errors %}
+                                    <span class="text-error text-sm">{{ form.end_date.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="badge badge-primary badge-md">3</span> ข้อมูลผู้ประสานงาน (พี่เลี้ยง)
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="form-control md:col-span-2">
+                                    <label class="label">
+                                        <span class="label-text font-bold">ชื่อ-นามสกุล <span class="text-error">*</span></span>
+                                    </label>
+                                    {{ form.supervisor_name }} {% if form.supervisor_name.errors %}
+                                    <span class="text-error text-sm">{{ form.supervisor_name.errors.0 }}</span>
+                                    {% endif %} 
+                                </div>
+
+                                <div class="form-control md:col-span-1">
+                                    <label class="label">
+                                        <span class="label-text font-bold">เบอร์โทรศัพท์ <span class="text-error">*</span></span>
+                                    </label>
+                                    {{ form.supervisor_phone }} 
+                                    {% if form.supervisor_phone.errors %}
+                                    <span class="text-error text-sm">{{ form.supervisor_phone.errors.0 }}</span>
+                                    {% endif %} 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider"></div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+                                <span class="badge badge-primary badge-md">3</span> ข้อมูลที่พักและผู้ติดต่อฉุกเฉิน
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="form-control col-span-3">
+                                    <label class="label">
+                                        <span class="label-text font-bold">ที่อยู่ที่พัก <span class="text-error">*</span></span>
+                                    </label>
+                                    {{ form.accommodation }} {% if form.accommodation.errors %}
+                                    <span class="text-error text-sm">{{ form.accommodation.errors.0 }}</span>
+                                    {% endif %} 
+                                </div>
+                                <div class="form-control md:col-span-2">
+                                    <label class="label">
+                                        <span class="label-text font-bold">ชื่อผู้ติดต่อฉุกเฉิน</span>
+                                    </label>
+                                    {{ form.emergency_contact }} {% if form.emergency_contact.errors %}
+                                    <span class="text-error text-sm">{{ form.emergency_contact.errors.0 }}</span>
+                                    {% endif %} 
+                                </div>
+                                <div class="form-control md:col-span-1">
+                                    <label class="label">
+                                        <span class="label-text font-bold">เบอร์โทรศัพท์ฉุกเฉิน <span class="text-error">*</span></span>
+                                    </label>
+                                    {{ form.emergency_phone }} {% if form.emergency_phone.errors %}
+                                    <span class="text-error text-sm">{{ form.emergency_phone.errors.0 }}</span>
+                                    {% endif %} 
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="card-actions justify-end mt-8 pt-4 border-t border-base-200">
+                            <button type="submit" class="btn btn-primary btn-wide text-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                ยืนยันการสมัครงาน
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .fade-in { animation: fadeIn 0.5s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectCompany(id, name, address) {
+        const searchInput = document.querySelector('input[name="company_search"]');
+        const hiddenInput = document.querySelector('input[name="company"]');
+        
+        hiddenInput.value = id;
+        searchInput.value = name;
+        
+        if (address) {
+            const locationInput = document.querySelector('[name="location"]');
+            if (locationInput) locationInput.value = address;
+        }
+
+        document.getElementById('company-results').innerHTML = '';
+    }
+
+    const searchInput = document.querySelector('input[name="company_search"]');
+    const hiddenInput = document.querySelector('input[name="company"]');
+
+    if(searchInput) {
+        searchInput.addEventListener('input', function() {
+            hiddenInput.value = ''; 
+        });
+    }
+    
+    document.addEventListener('click', function(e) {
+        const results = document.getElementById('company-results');
+        const input = document.querySelector('input[name="company_search"]');
+        if (results && !results.contains(e.target) && e.target !== input) {
+            results.innerHTML = '';
+        }
+    });
+</script>
+{% endblock %}

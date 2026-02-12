@@ -1,0 +1,148 @@
+<div class="overflow-x-auto">
+    <table class="table table-zebra w-full align-top">
+        <thead class="bg-primary/20 text-gray-700 text-sm">
+            <tr>
+                <th class="py-4 pl-6 w-1/4">บริษัท / ที่อยู่</th>
+                <th class="py-4 w-1/5">ประวัติการรับ (ปีการศึกษา)</th>
+                <th class="py-4 w-1/5">ตำแหน่งที่เคยรับ</th>
+                <th class="py-4 w-1/4">ความเห็นอาจารย์</th>
+                <th class="py-4 text-center">จัดการ</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            {% for c in page_obj %}
+            <tr class="hover border-b border-base-200 transition-colors align-top">
+                
+                <td class="pl-6 py-4">
+                    <div class="flex flex-col gap-1">
+                        <div class="font-bold text-lg text-primary">{{ c.name }}</div>
+                        
+                        <div class="text-sm text-gray-600 flex items-start gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mt-0.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span>{{ c.address|default:"-" }}</span>
+                        </div>
+
+                        {% if c.phone %}
+                        <div class="text-sm text-gray-500 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                            โทร: {{ c.phone }}
+                        </div>
+                        {% endif %}
+
+                    {% if c.student_count > 0 %}
+                        <div class="badge badge-success mt-2 text-sm px-3 py-1">
+                                เคยรับ นศ. {{ c.student_count }} คน
+                        </div>
+                    {% else %}
+                         <div class="badge badge-neutral mt-2 text-sm px-3 py-1">
+                                ยังไม่เคยรับ นศ.
+                        </div>
+                    {% endif %}
+                    </div>
+                </td>
+
+                <td class="py-4">
+                    <div class="flex flex-wrap gap-2">
+                    {% if c.years %}
+                        {% for year in c.years %}
+                            <span class="badge badge-sm badge-info">ปี {{ year }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-gray-400 text-sm">- ไม่มีประวัติ -</span>
+                    {% endif %}
+                    </div>
+                </td>
+
+                <td class="py-4">
+                    {% if c.positions %}
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        {% for pos in c.positions %}
+                            <li>{{ pos }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <span class="text-gray-400 text-sm">-</span>
+                    {% endif %}
+                </td>
+
+                <td class="py-4">
+                    <div class="bg-base-200/50 p-3 rounded-lg border border-base-200 text-sm min-h-[80px]">
+                        {% if c.teacher_notes %}
+                        <div class="comment-box">
+                            "{{ c.teacher_notes }}"
+                        </div>
+                        {% else %}
+                            <span class="text-gray-400">- ยังไม่มีความเห็น -</span>
+                        {% endif %}
+                    </div>
+                </td>
+
+                <td class="py-4 text-center">
+                    <button class="btn btn-sm btn-outline btn-primary gap-1"
+                            hx-get="{% url 'get-company-comment-modal' c.id %}"
+                            hx-target="#modal-container"
+                            hx-swap="innerHTML">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    edit
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-10 text-gray-400 bg-base-100/50">
+                    <div class="flex flex-col items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        <span>ไม่พบข้อมูลสถานประกอบการ</span>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="p-4 flex flex-col sm:flex-row justify-between items-center border-t border-base-200 bg-base-50 gap-4">
+    
+    <div class="text-xs text-gray-500">
+        แสดง {{ page_obj.start_index }} - {{ page_obj.end_index }} จาก {{ page_obj.paginator.count }} รายการ
+    </div>
+
+    <div class="join shadow-sm">
+        {% if page_obj.has_previous %}
+            <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300" 
+                    hx-get="?page={{ page_obj.previous_page_number }}&q={{ search_query }}" 
+                    hx-target="#company-list-container">
+                «
+            </button>
+        {% else %}
+            <button class="join-item btn btn-sm btn-disabled bg-base-100 border-base-200">«</button>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <button class="join-item btn btn-sm btn-active btn-primary text-white pointer-events-none">
+                    {{ num }}
+                </button>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300"
+                        hx-get="?page={{ num }}&q={{ search_query }}"
+                        hx-target="#company-list-container">
+                    {{ num }}
+                </button>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300" 
+                    hx-get="?page={{ page_obj.next_page_number }}&q={{ search_query }}" 
+                    hx-target="#company-list-container">
+                »
+            </button>
+        {% else %}
+            <button class="join-item btn btn-sm btn-disabled bg-base-100 border-base-200">»</button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

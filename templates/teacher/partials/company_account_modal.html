@@ -1,0 +1,138 @@
+<div id="company_account_modal" class="modal modal-open z-50 font-sans">
+    
+    <div class="modal-box w-11/12 max-w-lg p-0 bg-base-100 shadow-2xl rounded-xl relative overflow-hidden">
+        
+        <div class="bg-primary text-primary-content px-6 py-4 flex justify-between items-center shadow-md">
+            <h3 class="font-bold text-lg flex items-center gap-2 text-white">
+                {% if profile %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    แก้ไขข้อมูลบัญชี
+                {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    สร้างบัญชีใหม่
+                {% endif %}
+            </h3>
+            <button type="button" onclick="closeModal()" class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20">
+                ✕
+            </button>
+        </div>
+
+        <form hx-post="{% if profile %}{% url 'update-account' profile.id %}{% else %}{% url 'save-account' %}{% endif %}" 
+              hx-target="#account-list-container"
+              hx-on:htmx:after-request="closeModal()"
+              class="flex flex-col">
+            {% csrf_token %}
+            
+            <div class="p-6 space-y-5">
+                
+                <div class="form-control bg-base-200/50 p-4 rounded-lg border border-base-200">
+                    <label class="label pt-0">
+                        <span class="label-text font-bold text-gray-700 text-base">
+                            1. เลือกบริษัท <span class="text-error">*</span>
+                        </span>
+                    </label>
+                    <select name="company_id" class="select select-bordered w-full focus:select-primary" required>
+                        <option value="" disabled {% if not profile %}selected{% endif %}>-- เลือกสถานประกอบการ --</option>
+                        {% for company in companies %}
+                            <option value="{{ company.id }}" {% if profile and profile.company_id == company.id %}selected{% endif %}>
+                                {{ company.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <label class="label pb-0">
+                        <span class="label-text-alt text-gray-500">สำหรับบริษัทที่ยังไม่มีบัญชี หรือเลือกเพื่อแก้ไข</span>
+                    </label>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="font-bold text-sm text-gray-500 border-b border-base-200 pb-2 flex items-center gap-2">
+                        🔐 2. ข้อมูลเข้าสู่ระบบ (Login)
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        <div class="form-control">
+                            <label class="label py-1">
+                                <span class="label-text font-bold text-gray-700">Username <span class="text-error">*</span></span>
+                            </label>
+                            <input type="text" name="username" 
+                                   value="{{ profile.user.username|default:'' }}" 
+                                   class="input input-bordered w-full focus:input-primary bg-gray-50 font-mono tracking-wide" 
+                                   placeholder="เช่น tech_2024"
+                                   required />
+                        </div>
+                        <div class="form-control">
+                            <label class="label py-1">
+                                <span class="label-text font-bold text-gray-700">Password</span>
+                            </label>
+                            <input type="text" name="password" 
+                                   class="input input-bordered w-full focus:input-primary bg-gray-50 font-mono tracking-wide" 
+                                   placeholder="{% if profile %}เว้นว่างหากไม่ต้องการเปลี่ยน{% else %}กำหนดรหัสผ่าน{% endif %}" 
+                                   {% if not profile %}required{% endif %} />
+                            {% if profile %}
+                            <label class="label pb-0">
+                                <span class="label-text-alt text-gray-400">* กรอกเฉพาะเมื่อต้องการเปลี่ยนรหัสผ่านใหม่</span>
+                            </label>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="font-bold text-sm text-gray-500 border-b border-base-200 pb-2 flex items-center gap-2">
+                        👤 3. ข้อมูลผู้ติดต่อ (Profile)
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label py-1">
+                                <span class="label-text text-gray-700">ตำแหน่งงาน</span>
+                            </label>
+                            <input type="text" name="position" 
+                                   value="{{ profile.position|default:'' }}" 
+                                   class="input input-bordered w-full focus:input-primary" 
+                                   placeholder="เช่น HR Manager" />
+                        </div>
+                        <div class="form-control">
+                            <label class="label py-1">
+                                <span class="label-text text-gray-700">เบอร์โทรศัพท์</span>
+                            </label>
+                            <input type="text" name="phone" 
+                                   value="{{ profile.phone|default:'' }}" 
+                                   class="input input-bordered w-full focus:input-primary" 
+                                   placeholder="0xx-xxxxxxx" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-4 bg-base-100 border-t border-base-200 flex justify-end gap-3 rounded-b-xl bg-gray-50/50">
+                <button type="button" onclick="closeModal()" class="btn btn-ghost text-gray-500 font-normal hover:bg-gray-200">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="btn btn-primary text-white shadow-md px-6 gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                    บันทึกข้อมูล
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal-backdrop bg-black/60 fixed inset-0 -z-10" onclick="closeModal()"></div>
+</div>
+
+<script>
+    if (typeof closeModal !== 'function') {
+        function closeModal() {
+            const container = document.getElementById('modal-container');
+            if (container) container.innerHTML = '';
+            
+            const modal = document.getElementById('company_account_modal');
+            if (modal) modal.remove();
+        }
+    }
+</script>

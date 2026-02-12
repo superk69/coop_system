@@ -1,0 +1,59 @@
+<div id="forgot_modal" class="modal modal-open z-50 font-sans">
+    
+    <div class="modal-box relative shadow-2xl border-t-4 border-primary">
+        <button type="button" onclick="closeForgotModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+            </div>
+            <h3 class="font-bold text-xl text-primary">ลืมรหัสผ่าน?</h3>
+            <p class="py-2 text-gray-500 text-sm">ไม่ต้องกังวล! เพียงกรอกอีเมลของคุณด้านล่าง<br>เราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้</p>
+        </div>
+        
+        <form method="post" action="{% url 'password_reset' %}" class="space-y-4">
+            {% csrf_token %}
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-bold">อีเมลของคุณ</span>
+                </label>
+                <div class="relative">
+                    <input type="email" name="email" placeholder="name@example.com" required 
+                           class="input input-bordered w-full pl-10 focus:input-primary" />
+                    <span class="absolute left-3 top-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    </span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-full text-white shadow-md">
+                ส่งลิงก์รีเซตรหัสผ่าน
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <button onclick="closeForgotModal()" class="link link-hover text-sm text-gray-500 hover:text-primary">
+                กลับไปหน้าเข้าสู่ระบบ
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-backdrop bg-black/50 fixed inset-0 -z-10" onclick="closeForgotModal()"></div>
+</div>
+
+<script>
+    function closeForgotModal() {
+        // 1. ล้าง Container ของ Modal
+        const container = document.getElementById('modal-container');
+        if (container) {
+            container.innerHTML = '';
+        }
+        
+        // 2. ลบตัว Modal ทิ้ง (กรณี Fallback)
+        const modal = document.getElementById('forgot_modal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+</script>

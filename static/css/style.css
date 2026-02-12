@@ -1,0 +1,356 @@
+/* style.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
+
+:root {
+    /* ชุดสีใหม่ */
+    --bg-color: #ffffff;        /* พื้นหลังสีขาว */
+    --primary-color: #5cbdb9;   /* สีหลัก (Teal) */
+    --secondary-color: #fbe3e8; /* สีรอง (Pink) */
+    --accent-color: #ebf6f5;    /* สีตกแต่ง (Mint) */
+    
+    /* สีฟังก์ชันพื้นฐาน */
+    --text-color: #444444;      /* สีตัวอักษรเทาเข้ม */
+    --text-on-primary: #ffffff; /* ตัวอักษรบนสีหลัก */
+    --danger-color: #e74c3c;    /* สีแดง (ปรับให้นุ่มขึ้นเล็กน้อย) */
+    
+    --card-shadow: 0 4px 10px rgba(92, 189, 185, 0.15); /* เงาสี Teal จางๆ */
+}
+
+body {
+    font-family: 'Sarabun', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--primary-color);
+    color: var(--text-on-primary);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Container */
+.container {
+    max-width: 1000px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+    width: 100%;
+}
+
+/* Cards */
+.card {
+    background-color: #ffffff;
+    border-radius: 15px; /* เพิ่มความโค้งมน */
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--accent-color); /* เส้นขอบสีมินต์จางๆ */
+    position: relative;
+    overflow: hidden;
+}
+
+/* แถบสีตกแต่งด้านบน Card */
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background-color: var(--primary-color);
+}
+
+.card h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px; /* ปุ่มทรงแคปซูล */
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--text-on-primary);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: #c06c84; /* สีตัวอักษรชมพูเข้มเพื่อให้อ่านง่ายบนพื้นชมพูอ่อน */
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--accent-color); /* ขอบสีมินต์ */
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: 'Sarabun', sans-serif;
+    transition: border-color 0.3s;
+    background-color: #ffffff;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: var(--accent-color); /* เปลี่ยนพื้นหลังเป็นมินต์อ่อนเมื่อพิมพ์ */
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* เว้นระยะห่างระหว่างแถว */
+}
+
+th {
+    text-align: left;
+    padding: 15px;
+    color: #666;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+}
+
+td {
+    padding: 15px;
+    background-color: #fafafa; /* พื้นหลังแถวตาราง */
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+td:first-child {
+    border-left: 1px solid #f0f0f0;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+td:last-child {
+    border-right: 1px solid #f0f0f0;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Badges */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-pending {
+    background-color: var(--secondary-color); /* ชมพู */
+    color: #c06c84; /* ตัวอักษรชมพูเข้ม */
+}
+
+.badge-approved {
+    background-color: var(--accent-color); /* มินต์ */
+    color: var(--primary-color); /* ตัวอักษรเขียว Teal */
+}
+
+.badge-rejected {
+    background-color: #ffecec;
+    color: var(--danger-color);
+}
+
+/* Utility */
+.hidden {
+    display: none;
+}
+
+/* css/style.css (เพิ่มต่อท้ายไฟล์เดิม) */
+
+/* Layout สำหรับหน้า Dashboard ที่มี Sidebar */
+.d-flex {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar ด้านซ้าย */
+.sidebar {
+    width: 250px;
+    background-color: var(--primary-color); /* สี Teal */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    flex-shrink: 0;
+}
+
+.sidebar h2 {
+    color: white;
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding-bottom: 10px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: rgba(255,255,255,0.9);
+    padding: 15px 25px;
+    transition: 0.3s;
+    display: block;
+}
+
+.sidebar a:hover, .sidebar a.active {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    border-left: 5px solid var(--secondary-color); /* ขีดสีชมพู */
+}
+
+/* ส่วนเนื้อหาหลักด้านขวา */
+.main-content {
+    flex: 1;
+    background-color: #f8f9fa; /* สีพื้นหลังส่วนเนื้อหา */
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* Header เล็กๆ ในหน้าเนื้อหา */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* --- Modal Styles (เพิ่มใหม่) --- */
+.modal {
+    display: none; /* ซ่อนเป็นค่าเริ่มต้น */
+    position: fixed; 
+    z-index: 1000; /* อยู่บนสุด */
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); /* พื้นหลังสีดำจางๆ */
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* จัดกึ่งกลางแนวตั้ง */
+    padding: 25px;
+    border: 1px solid var(--accent-color);
+    width: 90%;
+    max-width: 500px; /* ความกว้างสูงสุด */
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    position: relative;
+    animation: slideIn 0.3s;
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: var(--danger-color);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {opacity: 0} to {opacity: 1}
+}
+@keyframes slideIn {
+    from {transform: translateY(-50px)} to {transform: translateY(0)}
+}
+
+/* css/style.css (เพิ่มต่อท้าย) */
+
+.doc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.doc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.doc-item:last-child {
+    border-bottom: none;
+}
+
+.doc-item:hover {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.doc-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.doc-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}

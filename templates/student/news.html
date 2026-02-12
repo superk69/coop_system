@@ -1,0 +1,125 @@
+{% extends "base.html" %} {% load static %}
+
+{% block title %}ข่าวสารและประกาศ{% endblock %}
+
+{% block content %}
+<div class="space-y-6 fade-in">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-base-200 pb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
+                 ข่าวสารและประกาศ
+            </h1>
+            <p class="text-gray-500 mt-2 text-base">ติดตามข้อมูลข่าวสารล่าสุดจากศูนย์สหกิจศึกษา</p>
+        </div>
+        <div class="hidden lg:flex items-center gap-4 bg-white py-2 px-6 rounded-full shadow-sm border border-base-200">
+            <div class="text-right">
+                <div class="font-bold text-gray-700 text-sm">{{ user.get_full_name }}</div>
+                <div class="text-xs text-gray-400 font-mono">{{ user.username }}</div>
+            </div>
+            <div class="avatar online placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <span class="text-lg font-bold">{{ user.first_name.0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <div class="lg:col-span-2 space-y-6">
+            {% for news in announcements %}
+            <div class="card bg-base-100 shadow-xl border border-base-200 hover:shadow-2xl transition-shadow duration-300">
+                <div class="card-body p-6">
+                    <div class="flex justify-between items-start">
+                        <h2 class="card-title text-lg font-bold">
+                            {% if news.is_pinned %}
+                                <div class="badge badge-error text-white gap-1 shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3">
+                                    <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                                    </svg>
+                                    ปักหมุด
+                                </div>
+                            {% endif %}
+                            {{ news.title }}
+                        </h2>
+                        <span class="text-xs text-gray-400 whitespace-nowrap ml-2">
+                            {{ news.created_at|date:"d M Y" }}
+                        </span>
+                    </div>
+
+                    <div class="divider my-2"></div>
+
+                    <div class="text-gray-600 text-sm leading-relaxed">
+                        {{ news.content|linebreaks }}
+                    </div>
+
+                    {% if news.image %}
+                    <figure class="mt-4 rounded-lg overflow-hidden max-h-64">
+                        <img src="{{ news.image.url }}" alt="News Image" class="w-full object-cover" />
+                    </figure>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>ยังไม่มีข่าวสารประกาศในขณะนี้</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="card bg-base-100 shadow-xl border border-base-200 sticky top-4">
+                <div class="card-body p-5">
+                    <h3 class="card-title text-base text-gray-700 flex items-center gap-2 mb-2">
+                        📂 เอกสารดาวน์โหลด
+                    </h3>
+                    
+                    <ul class="flex flex-col gap-2">
+                        {% for doc in documents %}
+                        <li class="group">
+                            <a href="{{ doc.attachment.url }}" target="_blank" class="flex items-center justify-between p-3 rounded-lg border border-base-200 bg-base-50 hover:bg-base-200 hover:border-primary transition-all duration-200">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <span class="text-2xl shrink-0">
+                                        {% if doc.extension == '.pdf' %}📕
+                                        {% elif doc.extension == '.doc' or doc.extension == '.docx' %}📘
+                                        {% elif doc.extension == '.xls' or doc.extension == '.xlsx' %}📗
+                                        {% elif doc.extension == '.jpg' or doc.extension == '.png' %}🖼️
+                                        {% else %}📄{% endif %}
+                                    </span>
+                                    
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-sm truncate group-hover:text-primary transition-colors">
+                                            {{ doc.title }}
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            {{ doc.created_at|date:"d/m/Y" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <span class="btn btn-circle btn-ghost btn-xs text-gray-400 group-hover:text-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                </span>
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li class="text-center py-6 text-gray-400 text-sm border-2 border-dashed border-base-300 rounded-lg">
+                            ไม่พบเอกสาร
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .fade-in { animation: fadeIn 0.5s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+{% endblock %}

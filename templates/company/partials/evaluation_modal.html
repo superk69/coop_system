@@ -1,0 +1,760 @@
+<div id="evaluation_modal" class="modal modal-open z-50 font-sans">
+    
+    <div class="modal-box w-11/12 max-w-4xl h-[90vh] p-0 flex flex-col bg-base-100 shadow-2xl rounded-xl overflow-hidden">
+        
+        <div class="navbar bg-primary text-primary-content px-6 py-3 shadow-md z-10 shrink-0">
+            <div class="flex-1">
+                <h3 class="font-bold text-xl flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                    แบบประเมินผลการปฏิบัติงาน
+                </h3>
+            </div>
+            <div class="flex-none">
+                <button type="button" onclick="closeModal()" class="btn btn-sm btn-circle btn-ghost hover:bg-white/20 text-white">✕</button>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'save-evaluation' job.id %}" class="flex flex-col flex-1 overflow-hidden">
+            {% csrf_token %}
+            
+            <div class="flex-1 overflow-y-auto bg-base-200/50 p-4 md:p-6 custom-scrollbar">
+                
+                <div class="card bg-base-100 shadow-sm border border-base-200 mb-6">
+                    <div class="card-body p-4 md:p-5">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center gap-4 w-full md:w-auto">
+                                <div class="avatar placeholder">
+                                    <div class="bg-neutral text-neutral-content rounded-full w-12">
+                                        <span class="text-xl font-bold">{{ job.student.user.first_name.0 }}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg text-gray-800">{{ job.student.user.get_full_name }}</h4>
+                                    <div class="flex flex-wrap gap-2 text-sm text-gray-500 mt-1">
+                                        <span class="badge badge-ghost badge-sm">รหัส: {{ job.student.student_code }}</span>
+                                        <span class="badge badge-ghost badge-sm">ตำแหน่ง: {{ job.position }}</span>
+                                    </div>
+                                    <div class="text-xs text-gray-400 mt-1">บริษัท: {{ job.company.name }}</div>
+                                </div>
+                            </div>
+
+                            <div class="stats shadow bg-info text-primary-content w-full md:w-auto">
+                                <div class="stat p-3 place-items-center min-w-[140px]">
+                                    <div class="stat-title text-primary-content/50 font-bold uppercase">คะแนนรวม</div>
+                                    <div class="stat-value text-3xl font-black" id="display-total-score">0</div>
+                                    <div class="stat-desc text-primary-content/50 ">จากคะแนนเต็ม 75</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow">
+                        <div class="card-body p-5">
+                            <h4 class="font-bold text-gray-700 text-base mb-3 flex items-start gap-2">
+                                <span class="badge badge-info badge-sm mt-1 shrink-0">{{ forloop.counter }}</span>
+                        ส่วนที่ 1: ผลสำเร็จของงาน (Work Achievement)
+                            </h4>
+
+                            <table class="table w-full">
+                                    <thead class="bg-base-200 text-center">
+                                        <tr>
+                                            <th class="w-1/3 text-left pl-4 text-base">หัวข้อการประเมิน</th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">5</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดีมาก</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">4</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดี</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">3</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอใช้</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">2</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอผ่าน</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-error">1</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ปรับปรุง</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q1_1.label }}</span>
+                                                {% if form.q1_1.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q1_1.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q1_1.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q1_1.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q1_1 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q1_2.label }}</span>
+                                                {% if form.q1_2.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q1_2.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q1_2.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q1_2.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q1_2 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q1_3.label }}</span>
+                                                {% if form.q1_3.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q1_3.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q1_3.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q1_3.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q1_3 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                </tbody>
+                            </table>
+                            <div class="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm">
+                                <div class="form-control">
+                                    <label class="label font-bold text-gray-700">
+                                        {{ form.c1_comment.label }}
+                                    </label>
+                                    {{ form.c1_comment }}
+                                    {% if form.c1_comment.errors %}
+                                        <span class="text-error text-sm mt-1">{{ form.c1_comment.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow">
+                        <div class="card-body p-5">
+                            <h4 class="font-bold text-gray-700 text-base mb-3 flex items-start gap-2">
+                                <span class="badge badge-info badge-sm mt-1 shrink-0">{{ forloop.counter }}</span>
+                                ส่วนที่ 2: ความรู้ความสามารถ (Knowledge & Ability)
+                            </h4>
+
+                            <table class="table w-full">
+                                    <thead class="bg-base-200 text-center">
+                                        <tr>
+                                            <th class="w-1/3 text-left pl-4 text-base">หัวข้อการประเมิน</th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">5</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดีมาก</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">4</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดี</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">3</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอใช้</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">2</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอผ่าน</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-error">1</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ปรับปรุง</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q2_1.label }}</span>
+                                                {% if form.q2_1.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q2_1.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q2_1.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q2_1.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q2_1 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q2_2.label }}</span>
+                                                {% if form.q2_2.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q2_2.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q2_2.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q2_2.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q2_2 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q2_3.label }}</span>
+                                                {% if form.q2_3.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q2_3.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q2_3.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q1_3.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q2_3 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                </tbody>
+                            </table>
+                            <div class="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm">
+                                <div class="form-control">
+                                    <label class="label font-bold text-gray-700">
+                                        {{ form.c2_comment.label }}
+                                    </label>
+                                    {{ form.c2_comment }}
+                                    {% if form.c2_comment.errors %}
+                                        <span class="text-error text-sm mt-1">{{ form.c2_comment.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow">
+                        <div class="card-body p-5">
+                            <h4 class="font-bold text-gray-700 text-base mb-3 flex items-start gap-2">
+                                <span class="badge badge-info badge-sm mt-1 shrink-0">{{ forloop.counter }}</span>
+                        ส่วนที่ 3: ความรับผิดชอบ (Responsibility)
+                            </h4>
+
+                            <table class="table w-full">
+                                    <thead class="bg-base-200 text-center">
+                                        <tr>
+                                            <th class="w-1/3 text-left pl-4 text-base">หัวข้อการประเมิน</th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">5</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดีมาก</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">4</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดี</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">3</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอใช้</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">2</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอผ่าน</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-error">1</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ปรับปรุง</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q3_1.label }}</span>
+                                                {% if form.q3_1.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q3_1.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q3_1.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q3_1.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q3_1 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q3_2.label }}</span>
+                                                {% if form.q3_2.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q3_2.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q3_2.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q3_2.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q3_2 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q3_3.label }}</span>
+                                                {% if form.q3_3.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q3_3.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q3_3.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q3_3.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q3_3 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                </tbody>
+                            </table>
+                            <div class="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm">
+                                <div class="form-control">
+                                    <label class="label font-bold text-gray-700">
+                                        {{ form.c3_comment.label }}
+                                    </label>
+                                    {{ form.c3_comment }}
+                                    {% if form.c3_comment.errors %}
+                                        <span class="text-error text-sm mt-1">{{ form.c3_comment.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow">
+                        <div class="card-body p-5">
+                            <h4 class="font-bold text-gray-700 text-base mb-3 flex items-start gap-2">
+                                <span class="badge badge-info badge-sm mt-1 shrink-0">{{ forloop.counter }}</span>
+                        ส่วนที่ 4: ลักษณะส่วนบุคคล (Personal Characteristics)
+                            </h4>
+
+                            <table class="table w-full">
+                                    <thead class="bg-base-200 text-center">
+                                        <tr>
+                                            <th class="w-1/3 text-left pl-4 text-base">หัวข้อการประเมิน</th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">5</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดีมาก</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">4</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดี</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">3</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอใช้</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">2</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอผ่าน</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-error">1</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ปรับปรุง</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q4_1.label }}</span>
+                                                {% if form.q4_1.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q4_1.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q4_1.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q4_1.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q4_1 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q4_2.label }}</span>
+                                                {% if form.q4_2.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q4_2.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q4_2.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q4_2.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q4_2 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q4_3.label }}</span>
+                                                {% if form.q4_3.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q4_3.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q4_3.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q4_3.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q4_3 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                </tbody>
+                            </table>
+                            <div class="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm">
+                                <div class="form-control">
+                                    <label class="label font-bold text-gray-700">
+                                        {{ form.c4_comment.label }}
+                                    </label>
+                                    {{ form.c4_comment }}
+                                    {% if form.c4_comment.errors %}
+                                        <span class="text-error text-sm mt-1">{{ form.c4_comment.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow">
+                        <div class="card-body p-5">
+                            <h4 class="font-bold text-gray-700 text-base mb-3 flex items-start gap-2">
+                                <span class="badge badge-info badge-sm mt-1 shrink-0">{{ forloop.counter }}</span>
+                        ส่วนที่ 5: การมีส่วนร่วมกับองค์กร (Participation)
+                            </h4>
+
+                            <table class="table w-full">
+                                    <thead class="bg-base-200 text-center">
+                                        <tr>
+                                            <th class="w-1/3 text-left pl-4 text-base">หัวข้อการประเมิน</th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">5</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดีมาก</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">4</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ดี</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">3</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอใช้</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-primary">2</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">พอผ่าน</span>
+                                                </div>
+                                            </th>
+                                            <th class="w-24 px-1">
+                                                <div class="flex flex-col">
+                                                    <span class="text-lg font-bold text-error">1</span>
+                                                    <span class="text-[10px] font-normal text-gray-500">ปรับปรุง</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q5_1.label }}</span>
+                                                {% if form.q5_1.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q5_1.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q5_1.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q5_1.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q5_1 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q5_2.label }}</span>
+                                                {% if form.q5_2.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q5_2.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q5_2.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q5_2.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q5_2 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        <tr class="hover:bg-base-100 transition-colors border-b border-base-200">
+                                            <td class="align-middle py-4 pl-4">
+                                                <span class="font-semibold text-gray-700 block">{{ form.q5_3.label }}</span>
+                                                {% if form.q5_3.help_text %}
+                                                    <span class="text-xs text-gray-400 font-light">{{ form.q5_3.help_text }}</span>
+                                                {% endif %}
+                                                {% if form.q5_3.errors %}
+                                                    <div class="text-error text-xs mt-1">{{ form.q3_3.errors.0 }}</div>
+                                                {% endif %}
+                                            </td>
+
+                                            {% for radio in form.q5_3 %}
+                                            <td class="text-center align-middle bg-gray-50/50">
+                                                <label class="cursor-pointer flex justify-center items-center w-full h-full py-4">
+                                                    {{ radio.tag }} 
+                                                </label>
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                </tbody>
+                            </table>
+                            <div class="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm">
+                                <div class="form-control">
+                                    <label class="label font-bold text-gray-700">
+                                        {{ form.c5_comment.label }}
+                                    </label>
+                                    {{ form.c5_comment }}
+                                    {% if form.c5_comment.errors %}
+                                        <span class="text-error text-sm mt-1">{{ form.c5_comment.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow">
+                        <div class="card-body p-5">
+                            <h4 class="font-bold text-gray-700 text-base mb-3 flex items-start gap-2">
+                                <span class="badge badge-info badge-sm mt-1 shrink-0">{{ forloop.counter }}</span>
+                        สรุปผลการประเมิน (Conclusion)
+                            </h4>
+
+                            <div class="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm">
+                                <div class="form-control">
+                                    <label class="label font-bold text-gray-700">
+                                        {{ form.strengths.label }}
+                                    </label>
+                                    {{ form.strengths }}
+                                    {% if form.strengths.errors %}
+                                        <span class="text-error text-sm mt-1">{{ form.strengths.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm">
+                                <div class="form-control">
+                                    <label class="label font-bold text-gray-700">
+                                        {{ form.weaknesses.label }}
+                                    </label>
+                                    {{ form.weaknesses }}
+                                    {% if form.weaknesses.errors %}
+                                        <span class="text-error text-sm mt-1">{{ form.weaknesses.errors.0 }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="p-4 bg-base-100 border-t border-base-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 shrink-0">
+                <div class="flex justify-between items-center max-w-4xl mx-auto">
+                    <span class="text-xs text-gray-400 hidden sm:inline">* กรุณาตรวจสอบข้อมูลก่อนบันทึก</span>
+                    
+                    <div class="flex gap-3 w-full sm:w-auto justify-end">
+                        <button type="button" onclick="closeModal()" class="btn btn-ghost text-gray-500 font-normal">
+                            ยกเลิก
+                        </button>
+                        
+                        {% if not is_readonly %}
+                        <button type="submit" class="btn btn-primary text-white shadow-lg px-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                            บันทึกผลการประเมิน
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal-backdrop bg-black/60 fixed inset-0 -z-10" onclick="closeModal()"></div>
+</div>
+
+<script>
+    // ฟังก์ชันสำหรับปิด Modal
+    function closeModal() {
+        const container = document.getElementById('modal-container');
+        if (container) container.innerHTML = ''; // ล้าง content ใน container
+        
+        const modal = document.getElementById('evaluation_modal');
+        if (modal) modal.remove(); // ลบ element ทิ้ง
+    }
+
+    // ฟังก์ชันคำนวณคะแนนแบบ Real-time
+    (function() {
+        function updateScore() {
+            let total = 0;
+            // เลือก input radio ทั้งหมดที่ถูก check
+            // หมายเหตุ: selector นี้จะทำงานได้ดีถ้า forms.py ไม่ได้ใส่ class อะไรพิเศษ
+            // หรือถ้าใส่ class 'rating-radio' มาก็ใช้ selector นั้นได้เลย
+            const checkedRadios = document.querySelectorAll('#evaluation_modal input[type="radio"]:checked');
+            
+            checkedRadios.forEach(radio => {
+                const val = parseInt(radio.value);
+                if (!isNaN(val)) {
+                    total += val;
+                }
+            });
+            
+            // อัปเดตตัวเลขบนหน้าจอ
+            const displayEl = document.getElementById('display-total-score');
+            if(displayEl) {
+                // Effect ตัวเลขวิ่งเล็กน้อย (Optional)
+                displayEl.innerText = total;
+            }
+        }
+
+        // เพิ่ม Event Listener ให้กับ Radio Button ทุกตัวใน Modal
+        const radios = document.querySelectorAll('#evaluation_modal input[type="radio"]');
+        radios.forEach(radio => {
+            radio.addEventListener('change', updateScore);
+            
+            // ปรับแต่ง CSS ของ Radio Button ด้วย JS (ถ้า forms.py ไม่ได้ทำมา)
+            // เพื่อให้เข้ากับธีม DaisyUI
+            radio.classList.add('radio', 'radio-primary', 'radio-sm', 'cursor-pointer');
+            
+            // ปรับแต่ง Label ที่ห่อหุ้ม (ถ้ามี)
+            if(radio.parentElement.tagName === 'LABEL') {
+                radio.parentElement.classList.add('cursor-pointer', 'flex', 'items-center', 'gap-2', 'mr-4');
+            } else if (radio.parentElement.tagName === 'LI') {
+                 // กรณี Django render เป็น ul > li
+                 radio.parentElement.classList.add('inline-flex', 'items-center', 'gap-2', 'mr-4', 'mb-2');
+                 radio.parentElement.style.listStyle = 'none';
+            }
+        });
+
+        // คำนวณครั้งแรกตอนโหลด (เผื่อมีค่าเดิม)
+        updateScore();
+    })();
+</script>

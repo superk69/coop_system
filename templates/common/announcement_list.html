@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Student - ข่าวสารและเอกสาร</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* จัด Layout ให้ข่าวสารอยู่ซ้าย เอกสารอยู่ขวา (เฉพาะหน้าจอใหญ่) */
+        @media (min-width: 768px) {
+            .news-layout {
+                display: grid;
+                grid-template-columns: 2fr 1fr; /* ข่าว 2 ส่วน : เอกสาร 1 ส่วน */
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <nav class="sidebar">
+            <h2>Student Portal</h2>
+            <a href="student_dashboard.html">📊 ภาพรวมความก้าวหน้า</a>
+            <a href="student_news.html" class="active">📢 ข่าวสารและประกาศ</a>
+            <a href="student_training.html">📚 บันทึกการอบรม</a>
+            <a href="student_job.html">🏢 สมัครงานสหกิจ</a>
+            <a href="student_report.html">📝 รายงานรายสัปดาห์</a>
+            <a href="index.html" style="margin-top: auto; background:#c0392b;">🚪 ออกจากระบบ</a>
+        </nav>
+
+        <main class="main-content">
+            <div class="header-bar">
+                <h2>ข่าวสารและเอกสาร (FR-06, FR-11)</h2>
+            </div>
+            
+            <div class="news-layout">
+                
+                <div>
+                    <h3 style="margin-top:0; color:var(--primary-color);">📢 ประกาศล่าสุด</h3>
+                    <div id="news-container">
+                        </div>
+                </div>
+
+                <div>
+                    <div class="card" style="position: sticky; top: 20px;">
+                        <h3 style="margin-top:0; border-bottom: 2px solid var(--accent-color); padding-bottom:10px; color:var(--primary-color);">
+                            📂 เอกสารดาวน์โหลด
+                        </h3>
+                        <ul id="doc-list" class="doc-list">
+                            </ul>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/logic.js"></script>
+    <script>
+        // 1. Render News (FR-06)
+        const newsContainer = document.getElementById('news-container');
+        
+        // เรียงข่าวใหม่สุดขึ้นก่อน
+        const sortedNews = db.announcements.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        if (sortedNews.length === 0) {
+            newsContainer.innerHTML = '<div class="card"><p>ยังไม่มีประกาศ</p></div>';
+        } else {
+            sortedNews.forEach(n => {
+                const html = `
+                    <div class="card" style="margin-bottom: 15px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <strong style="font-size:1.1rem; color:var(--text-color);">${n.title}</strong>
+                            <small style="color:#888;">📅 ${n.date}</small>
+                        </div>
+                        <p style="color:#555; line-height:1.6;">${n.content}</p>
+                    </div>
+                `;
+                newsContainer.innerHTML += html;
+            });
+        }
+
+        // 2. Render Documents (FR-11) - เพิ่มใหม่
+        const docContainer = document.getElementById('doc-list');
+        
+        // ถ้าใน data.js ยังไม่มีตัวแปร documents ให้ใช้ค่าว่างป้องกัน Error
+        const docs = (typeof documents !== 'undefined') ? documents : [];
+
+        if (docs.length === 0) {
+            docContainer.innerHTML = '<li style="padding:15px; text-align:center; color:#999;">ไม่พบเอกสาร</li>';
+        } else {
+            docs.forEach(d => {
+                // เลือกไอคอนตามประเภทไฟล์
+                let icon = '📄';
+                if(d.name.endsWith('.pdf')) icon = '📕';
+                if(d.name.endsWith('.docx') || d.name.endsWith('.doc')) icon = '📘';
+                if(d.name.endsWith('.jpg') || d.name.endsWith('.png')) icon = '🖼️';
+
+                const html = `
+                    <li class="doc-item">
+                        <div class="doc-info">
+                            <span class="doc-icon">${icon}</span>
+                            <div>
+                                <div style="font-weight:bold; font-size:0.95rem;">${d.name}</div>
+                                <div style="font-size:0.8rem; color:#888;">${d.date} • ${d.size}</div>
+                            </div>
+                        </div>
+                        <a href="#" onclick="alert('กำลังดาวน์โหลดไฟล์: ${d.name}')" class="btn btn-secondary" style="padding:5px 10px; font-size:0.8rem;">
+                            ⬇️
+                        </a>
+                    </li>
+                `;
+                docContainer.innerHTML += html;
+            });
+        }
+    </script>
+</body>
+</html>

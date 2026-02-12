@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="card" style="width: 100%; max-width: 400px; text-align: center; padding: 40px; background: #fff; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+    
+    <h2 style="border:none; color:var(--primary-color);">เข้าสู่ระบบ</h2>
+    <p style="margin-bottom:20px; color:#666;">ระบบติดตามกระบวนการสหกิจศึกษา</p>
+
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px; text-align: left;">
+            <label style="font-weight: bold; color: #555;">ชื่อผู้ใช้</label>
+            <input type="text" name="username" class="form-control" placeholder="กรอกชื่อผู้ใช้" required 
+                   style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 15px; text-align: left;">
+            <label style="font-weight: bold; color: #555;">รหัสผ่าน</label>
+            <input type="password" name="password" class="form-control" placeholder="กรอกรหัสผ่าน" required
+                   style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" 
+                style="width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: 0.3s;">
+            เข้าสู่ระบบ
+        </button>
+    </form>
+
+    <div class="login-link" style="margin-top: 20px;">
+        <a style="cursor: pointer; color: #666; font-size: 0.85rem;" 
+           hx-get="{% url 'get-forgot-modal' %}" 
+           hx-target="#modal-container" 
+           hx-swap="innerHTML">
+            ลืมรหัสผ่าน?
+        </a>
+    </div>
+
+    <div class="login-link" style="margin-top: 20px;">
+        ยังไม่มีบัญชี? 
+        <a style="cursor: pointer; color: var(--primary-color); font-weight: bold;"
+           hx-get="{% url 'get-register-modal' %}" 
+           hx-target="#modal-container" 
+           hx-swap="innerHTML">
+            ลงทะเบียนสำหรับนักศึกษา
+        </a>
+    </div>
+</div>
+{% endblock %}

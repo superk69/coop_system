@@ -1,0 +1,393 @@
+<div id="evaluation_detail_modal" class="modal modal-open z-50 font-sans">
+    
+    <div class="modal-box w-11/12 max-w-4xl p-0 bg-base-100 shadow-2xl rounded-xl relative overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <div class="px-6 py-4 flex justify-between items-center shadow-md shrink-0 
+                    {% if eval.status == 'APPROVED' %}bg-success text-success-content{% else %}bg-warning text-warning-content{% endif %}">
+            <div class="flex items-center gap-3">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    📊 รายละเอียดผลการประเมิน
+                </h3>
+                {% if eval.status == 'APPROVED' %}
+                    <span class="badge badge-white text-success font-bold border-none shadow-sm">รับทราบแล้ว</span>
+                {% else %}
+                    <span class="badge badge-white text-warning font-bold border-none shadow-sm">รอการตรวจสอบ</span>
+                {% endif %}
+            </div>
+            <button type="button" onclick="closeModal()" class="btn btn-sm btn-circle btn-ghost hover:bg-white/20">✕</button>
+        </div>
+
+        <div class="p-6 overflow-y-auto bg-base-100 flex-1 custom-scrollbar space-y-6">
+            
+            <div class="bg-base-200/50 border border-base-200 rounded-xl p-5 shadow-sm">
+                <h4 class="font-bold text-gray-700 text-sm mb-3 border-b border-base-300 pb-2 flex items-center gap-2">
+                    👤 ข้อมูลทั่วไป
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                    <div>
+                        <span class="text-xs text-gray-500 font-bold block mb-1">นักศึกษา</span>
+                        <div class="font-bold text-gray-800 text-base">{{ job.student.user.get_full_name }}</div>
+                        <div class="text-xs text-gray-400 font-mono">รหัส: {{ job.student.student_code }}</div>
+                    </div>
+                    <div>
+                        <span class="text-xs text-gray-500 font-bold block mb-1">สถานประกอบการ</span>
+                        <div class="text-gray-800 font-medium">{{ job.company.name }}</div>
+                        <div class="badge badge-ghost badge-sm mt-1">{{ job.position }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-base-100 border border-base-200 rounded-xl shadow-sm overflow-hidden">
+                
+                <div class="p-4 bg-base-50 border-b border-base-200 flex flex-wrap justify-between items-center gap-2">
+                    <h4 class="font-bold text-gray-700 text-sm flex items-center gap-2">
+                        📋 หัวข้อการประเมิน
+                    </h4>
+                    <span class="text-xs font-medium px-2 py-1 bg-white border border-base-300 rounded text-gray-500">
+                        คะแนนเต็มรวม: {{ eval.full_score|default:"75" }}
+                    </span>
+                </div>
+
+                <div class="divide-y divide-base-200">
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <h5 class="text-sm font-bold text-gray-800 leading-snug">
+                                    ส่วนที่ 1: ผลสำเร็จของงาน (Work Achievement)
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>1.1 ปริมาณงาน (Quantity of work)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q1_1 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q1_1 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>1.2 คุณภาพงาน (Quality of work)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q1_2 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q1_2 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>1.3 ความสำเร็จตามเป้าหมาย (Success against targets)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q1_3 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q1_3 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 relative">
+                        <div class="absolute -top-3 left-4 bg-gray-100 px-2 text-xs font-bold text-gray-500 border border-gray-200 rounded">
+                            💬 ข้อเสนอแนะ
+                        </div>
+                        <p class="text-gray-600 text-sm italic leading-relaxed mt-1">"{{ eval.c1_comment }}"</p>
+                    </div>
+                </div>
+                <div class="divide-y divide-base-200">
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <h5 class="text-sm font-bold text-gray-800 leading-snug">
+                                    ส่วนที่ 2: ความรู้ความสามารถ (Knowledge & Ability)
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>2.1 ความรู้ทางวิชาการ (Academic knowledge)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q2_1 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q2_1 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>2.2 ความสามารถในการเรียนรู้งาน (Ability to learn)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q2_2 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q2_2 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>2.3 ทักษะการปฏิบัติงาน (Practical skills)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q2_3 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q2_3 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 relative">
+                        <div class="absolute -top-3 left-4 bg-gray-100 px-2 text-xs font-bold text-gray-500 border border-gray-200 rounded">
+                            💬 ข้อเสนอแนะ
+                        </div>
+                        <p class="text-gray-600 text-sm italic leading-relaxed mt-1">"{{ eval.c2_comment }}"</p>
+                    </div>
+                </div>
+                <div class="divide-y divide-base-200">
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <h5 class="text-sm font-bold text-gray-800 leading-snug">
+                                    ส่วนที่ 3: ความรับผิดชอบ (Responsibility)
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>3.1 ความรับผิดชอบต่อหน้าที่ (Responsibility)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q3_1 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q3_1 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>3.2 ความตรงต่อเวลา (Punctuality)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q3_2 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q3_2 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>3.3 การปฏิบัติตามกฎระเบียบ (Discipline)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q3_3 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q3_3 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 relative">
+                        <div class="absolute -top-3 left-4 bg-gray-100 px-2 text-xs font-bold text-gray-500 border border-gray-200 rounded">
+                            💬 ข้อเสนอแนะ
+                        </div>
+                        <p class="text-gray-600 text-sm italic leading-relaxed mt-1">"{{ eval.c3_comment }}"</p>
+                    </div>
+                </div>
+                <div class="divide-y divide-base-200">
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <h5 class="text-sm font-bold text-gray-800 leading-snug">
+                                    ส่วนที่ 4: ลักษณะส่วนบุคคล (Personal Characteristics)
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>4.1 บุคลิกภาพและการวางตัว (Personality)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q4_1 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q4_1 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>4.2 มนุษยสัมพันธ์ (Human Relations)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q4_2 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q4_2 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>4.3 ความกระตือรือร้น (Enthusiasm)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q4_3 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q4_3 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 relative">
+                        <div class="absolute -top-3 left-4 bg-gray-100 px-2 text-xs font-bold text-gray-500 border border-gray-200 rounded">
+                            💬 ข้อเสนอแนะ
+                        </div>
+                        <p class="text-gray-600 text-sm italic leading-relaxed mt-1">"{{ eval.c4_comment }}"</p>
+                    </div>
+                </div>
+                <div class="divide-y divide-base-200">
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <h5 class="text-sm font-bold text-gray-800 leading-snug">
+                                    ส่วนที่ 5: การมีส่วนร่วมกับองค์กร (Participation)
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q5_1 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q5_1 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>5.2 การเสนอความคิดเห็น (Suggestions)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q5_2 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q5_2 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <span>5.3 จริยธรรมและคุณธรรม (Ethics)</span> 
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-0 overflow-hidden shrink-0 shadow-sm self-end sm:self-center">
+                            <div class="font-bold text-lg {% if eval.q5_3 == '5' %}text-success{% else %}text-primary{% endif %}">
+                                    {{ eval.q5_3 }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 relative">
+                        <div class="absolute -top-3 left-4 bg-gray-100 px-2 text-xs font-bold text-gray-500 border border-gray-200 rounded">
+                            💬 ข้อเสนอแนะ
+                        </div>
+                        <p class="text-gray-600 text-sm italic leading-relaxed mt-1">"{{ eval.c5_comment }}"</p>
+                    </div>
+                </div>
+                <div class="divide-y divide-base-200">
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <h5 class="text-sm font-bold text-gray-800 leading-snug">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    สรุปความเห็นจากพี่เลี้ยง (จุดเด่น)
+                                </h5>
+                                <p class="text-gray-600 text-sm mt-2">{{ eval.strengths|default:"-" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-base-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div>
+                                <h5 class="text-sm font-bold text-gray-800 leading-snug">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    สรุปความเห็นจากพี่เลี้ยง (จุดที่ควรปรับปรุง)
+                                </h5>
+                                <p class="text-gray-600 text-sm mt-2">{{ eval.weaknesses|default:"-" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-end items-center gap-4 p-5 bg-gradient-to-r from-base-100 to-primary/5 border border-primary/20 rounded-xl shadow-sm">
+                <div class="text-gray-600 font-bold text-lg">คะแนนรวมทั้งสิ้น</div>
+                <div class="flex items-baseline gap-2 bg-white px-6 py-2 rounded-xl border border-primary/30 shadow-inner">
+                    <span class="text-4xl font-black text-primary">{{ eval.total_score }}</span>
+                    <span class="text-gray-400 font-medium text-lg">/ {{ eval.full_score|default:"75" }}</span>
+                </div>
+            </div>
+            
+            {% if eval.comment %}
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 relative">
+                <div class="absolute -top-3 left-4 bg-gray-100 px-2 text-xs font-bold text-gray-500 border border-gray-200 rounded">
+                    💬 ข้อเสนอแนะ
+                </div>
+                <p class="text-gray-600 text-sm italic leading-relaxed mt-1">"{{ eval.comment }}"</p>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <div class="p-4 bg-base-100 border-t border-base-200 shrink-0 z-10 flex justify-end gap-3 bg-gray-50/50">
+            <button onclick="closeModal()" class="btn btn-ghost text-gray-500 hover:bg-gray-200">
+                ปิดหน้าต่าง
+            </button>
+            
+            {% if eval.status != 'APPROVED' %}
+                <button class="btn btn-primary text-white shadow-md gap-2"
+                        hx-post="{% url 'acknowledge-evaluation' eval.id %}"
+                        hx-target="#evaluation-list-container" 
+                        hx-on:htmx:after-request="closeModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    รับทราบผลการประเมิน
+                </button>
+            {% else %}
+                 <button class="btn btn-disabled opacity-50 cursor-not-allowed">
+                    รับทราบแล้ว
+                </button>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="modal-backdrop bg-black/60 fixed inset-0 -z-10" onclick="closeModal()"></div>
+</div>
+
+<script>
+    if (typeof closeModal !== 'function') {
+        function closeModal() {
+            const container = document.getElementById('modal-container');
+            if (container) container.innerHTML = '';
+            
+            const modal = document.getElementById('evaluation_detail_modal');
+            if (modal) modal.remove();
+        }
+    }
+</script>

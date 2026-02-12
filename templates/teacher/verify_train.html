@@ -1,0 +1,54 @@
+{% extends "base_teacher.html" %}
+{% load static %}
+
+{% block title %}ตรวจสอบประวัติการอบรม{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>
+                ตรวจสอบ <span class="text-primary">การอบรม</span>
+            </h1>
+            <p class="text-gray-500 mt-2 text-base">อนุมัติชั่วโมงการอบรมเตรียมความพร้อมสหกิจศึกษา</p>
+        </div>
+        <div class="hidden lg:flex items-center gap-4 bg-white py-2 px-6 rounded-full shadow-sm border border-base-200">
+            <div class="text-right">
+                <div class="font-bold text-gray-700 text-sm">{{ user.get_full_name }}</div>
+                <div class="text-xs text-gray-400 font-mono">{{ user.username }}</div>
+            </div>
+            <div class="avatar online placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <span class="text-lg font-bold">{{ user.first_name.0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-lg mb-6">
+        <div class="card-body p-4 md:p-6">
+            <form class="flex flex-col md:flex-row gap-4 items-end md:items-center justify-between"
+                  hx-get="{% url 'teacher-verify-train' %}" 
+                  hx-target="#training-list-container" 
+                  hx-trigger="change from:select, keyup delay:500ms from:input">
+                
+                <div class="flex flex-col md:flex-row gap-4 w-full">
+                    <div class="form-control w-full md:w-1/2">
+                        <label class="label py-1"><span class="label-text font-bold">ค้นหา</span></label>
+                        <div class="relative">
+                            <input type="text" name="q" placeholder="ชื่อนักศึกษา, รหัส, หัวข้อ..." 
+                                   class="input input-bordered w-full pl-10 focus:input-primary" 
+                                   value="{{ request.GET.q }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="training-list-container" class="bg-base-200 rounded-xl border border-base-200 overflow-hidden min-h-[400px]">
+        {% include "teacher/partials/training_list.html" %}
+    </div>
+
+{% endblock %}

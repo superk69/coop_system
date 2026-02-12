@@ -1,0 +1,215 @@
+<div class="card bg-base-100 shadow-md mb-8">
+    <div class="card-body p-0">
+        <div class="p-4 border-b border-warning/20 bg-warning/5 flex items-center justify-between">
+            <h3 class="font-bold text-lg text-warning-content flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                รายการรออนุมัติ (รอดำเนินการ)
+                <span class="badge badge-warning text-white font-bold shadow-sm">{{ pending_list.count }}</span>
+            </h3>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="table w-full align-middle">
+                <thead class="bg-warning/10 text-gray-700 text-sm">
+                    <tr>
+                        <th class="pl-6 w-1/6">วันที่อบรม</th>
+                        <th class="w-1/4">นักศึกษา</th>
+                        <th class="w-1/4">หัวข้อเรื่อง</th>
+                        <th class="text-center w-24">ขอชั่วโมง</th>
+                        <th class="text-center w-24">หลักฐาน</th>
+                        <th class="text-center w-1/4">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in pending_list %}
+                    <tr class="hover:bg-warning/5 transition-colors border-b border-warning/10 last:border-none">
+                        <td class="pl-6 py-4">
+                            <div class="font-bold text-gray-800">{{ t.date|date:"d M Y" }}</div>
+                        </td>
+                        
+                        <td class="py-4">
+                            <div class="font-bold text-gray-800">{{ t.student.user.get_full_name }}</div>
+                            <div class="text-xs text-gray-500 font-mono">รหัส: {{ t.student.student_code }}</div>
+                        </td>
+                        
+                        <td class="py-4">
+                            <div class="font-medium text-gray-700 line-clamp-2">{{ t.topic }}</div>
+                        </td>
+                        
+                        <td class="text-center font-bold text-lg text-primary">
+                            {{ t.hours }}
+                        </td>
+                        
+                        <td class="text-center">
+                            {% if t.proof_file %}
+                                <a href="{{ t.proof_file.url }}" target="_blank" class="btn btn-sm btn-circle btn-ghost text-info tooltip" data-tip="ดูหลักฐาน">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                                </a>
+                            {% else %}
+                                <span class="text-gray-300">-</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-primary btn-outline text-primary shadow-sm gap-2"
+                                    hx-get="{% url 'get-approve-modal' t.id %}"
+                                    hx-target="#modal-container"
+                                    hx-swap="innerHTML">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                ตรวจสอบ
+                            </button>
+                            <button  class="btn btn-sm btn-error btn-outline text-error shadow-sm gap-2"
+                                    hx-get="{% url 'get-reject-modal' t.id %}"
+                                    hx-target="#modal-container"
+                                    hx-swap="innerHTML">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                ปฏิเสธ
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-10 text-gray-400 bg-base-100/50">
+                            <div class="flex flex-col items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="card bg-base-100 shadow-md border border-base-200">
+    <div class="card-body p-0">
+        <div class="p-4 border-b border-info/20 bg-info/5 flex items-center justify-between">
+            <h3 class="font-bold text-lg text-gray-700 flex items-center gap-2">
+                📚 ประวัติการยื่นขอชั่วโมง
+            </h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full align-middle">
+                <thead class="bg-info/10 text-gray-700 text-sm">
+                    <tr>
+                        <th class="pl-6 w-1/6">วันที่อบรม</th>
+                        <th class="w-1/4">นักศึกษา</th>
+                        <th class="w-1/4">หัวข้อเรื่อง</th>
+                        <th class="text-center w-24">สถานะ</th>
+                        <th class="text-center w-24">ชั่วโมง</th>
+                        <th class="text-center w-24">หลักฐาน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in page_obj %}
+                    <tr class="hover border-b border-base-200 transition-colors">
+                        <td class="pl-6 py-4">
+                            <div class="font-bold text-gray-800">{{ t.date|date:"d M Y" }}</div>
+                        </td>
+
+                        <td class="py-4">
+                            <div class="font-bold text-gray-700">{{ t.student.user.get_full_name }}</div>
+                            <div class="text-xs text-gray-400 font-mono">รหัส: {{ t.student.student_code }}</div>
+                        </td>
+
+                        <td class="py-4">
+                            <div class="text-gray-800 font-medium">{{ t.topic }}</div>
+                        </td>
+
+                        <td class="text-center">
+                            {% if t.status == 'APPROVED' %}
+                                <div class="badge badge-success text-white badge-sm gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                    อนุมัติ
+                                </div>
+                            {% elif t.status == 'PENDING' %}
+                                <div class="badge badge-warning text-white badge-sm gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    รอตรวจสอบ
+                                </div>
+                            {% else %}
+                                <div class="badge badge-error text-white badge-sm gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    ไม่อนุมัติ
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center font-bold text-gray-600">
+                            {{ t.get_hours }}
+                        </td>
+
+                        <td class="text-center">
+                            {% if t.proof_file %}
+                                <a href="{{ t.proof_file.url }}" target="_blank" class="btn btn-sm btn-ghost btn-circle text-gray-500 hover:text-primary tooltip" data-tip="ดูหลักฐาน">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                                </a>
+                            {% else %}
+                                <span class="text-gray-300">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-10 text-gray-400 bg-base-100/50">
+                            <div class="flex flex-col items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                <span>ไม่พบประวัติการอบรม</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="p-4 flex flex-col sm:flex-row justify-between items-center border-t border-base-200 bg-base-50 gap-4">
+            <div class="text-xs text-gray-500">
+                แสดง {{ page_obj.start_index }} - {{ page_obj.end_index }} จาก {{ page_obj.paginator.count }} รายการ
+            </div>
+            
+            <div class="join shadow-sm">
+                {% if page_obj.has_previous %}
+                    <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300" 
+                            hx-get="?page={{ page_obj.previous_page_number }}&q={{ search_query }}" 
+                            hx-target="#training-list-container">
+                        «
+                    </button>
+                {% else %}
+                    <button class="join-item btn btn-sm btn-disabled bg-base-100 border-base-200">«</button>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <button class="join-item btn btn-sm btn-active btn-primary text-white pointer-events-none">
+                            {{ num }}
+                        </button>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300"
+                                hx-get="?page={{ num }}&q={{ search_query }}"
+                                hx-target="#training-list-container">
+                            {{ num }}
+                        </button>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <button class="join-item btn btn-sm btn-outline bg-white hover:bg-base-200 border-base-300" 
+                            hx-get="?page={{ page_obj.next_page_number }}&q={{ search_query }}" 
+                            hx-target="#training-list-container">
+                        »
+                    </button>
+                {% else %}
+                    <button class="join-item btn btn-sm btn-disabled bg-base-100 border-base-200">»</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>

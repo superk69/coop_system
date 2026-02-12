@@ -1,0 +1,77 @@
+<dialog id="cancel_modal" class="modal modal-open backdrop-blur-sm">
+    <div class="modal-box border-t-4 border-error shadow-2xl relative">
+        
+        <button onclick="closeModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        
+        <h3 class="font-bold text-lg text-error flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            ยืนยันการสละสิทธิ์/ยกเลิก
+        </h3>
+        
+        <div role="alert" class="alert alert-warning mt-4 text-sm shadow-sm flex flex-col items-start gap-1">
+            <div class="flex items-center gap-2 font-bold w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>คุณกำลังจะยกเลิกการฝึกงานที่:</span>
+            </div>
+            <div class="pl-8 w-full text-base font-semibold truncate text-gray-800">
+                {{ job.company_name }}
+            </div>
+            <div class="pl-8 text-xs opacity-80 mt-1">
+                *เมื่อยกเลิกแล้ว คุณจะต้องเริ่มกระบวนการสมัครงานใหม่ทั้งหมด
+            </div>
+        </div>
+
+        <form action="{% url 'cancel-job-application' job %}" method="POST" class="mt-4">
+            {% csrf_token %}
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-bold">เหตุผลการยกเลิก (จำเป็น):</span>
+                </label>
+                <textarea name="cancel_reason" 
+                          class="textarea textarea-bordered h-24 w-full focus:textarea-error" 
+                          placeholder="เช่น ได้งานที่ใหม่ที่ตรงสายกว่า, มีปัญหาเรื่องการเดินทาง..." 
+                          required></textarea>
+                <label class="label">
+                    <span class="label-text-alt text-gray-500">ข้อมูลนี้จะถูกส่งให้อาจารย์ที่ปรึกษาทราบ</span>
+                </label>
+            </div>
+
+            <div class="modal-action mt-6">
+                <button type="button" onclick="closeModal()" class="btn btn-ghost text-gray-500">
+                    ย้อนกลับ
+                </button>
+                
+                <button type="submit" class="btn btn-error text-white shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    ยืนยันการสละสิทธิ์
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <form method="dialog" class="modal-backdrop">
+        <button onclick="closeModal()">close</button>
+    </form>
+</dialog>
+
+<script>
+    // ฟังก์ชันสำหรับปิด Modal
+    // เนื่องจาก HTMX โหลดมาใส่ใน Container เรามักจะเคลียร์ innerHTML ของ Container นั้น
+    function closeModal() {
+        const modalElement = document.getElementById('cancel_modal');
+        // Animation fade out แบบง่าย (ถ้าต้องการ) หรือลบทิ้งเลย
+        modalElement.classList.remove('modal-open');
+        
+        // รอ Animation สักนิดแล้วค่อยลบออกจาก DOM (ถ้าใช้ transition)
+        // หรือถ้า Container คือ #modal-container ก็เคลียร์ content
+        setTimeout(() => {
+            const container = document.getElementById('modal_container');
+            if(container) {
+                container.innerHTML = '';
+            } else {
+                modalElement.remove(); // Fallback
+            }
+        }, 100);
+    }
+</script>

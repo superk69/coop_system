@@ -1,0 +1,47 @@
+<tr id="job-row-{{ s.id }}" class="hover:bg-base-100 transition-colors">
+    <td class="pl-6 font-semibold text-gray-700">
+        <div class="flex items-center gap-3">
+            <div class="avatar placeholder">
+                <div class="bg-neutral-focus text-neutral-content rounded-full w-8 h-8">
+                    <span class="text-xs">{{ s.student.user.first_name.0 }}</span>
+                </div>
+            </div>
+            {{ s.student.user.get_full_name }}
+        </div>
+    </td>
+    <td class="text-gray-600">
+        <div class="badge badge-ghost gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            {{ s.position }}
+        </div>
+    </td>
+    <td class="text-center">
+        {% if s.evaluation.status == 'APPROVED' %}
+            <div class="badge badge-success text-white gap-1 shadow-sm p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                อาจารย์รับรองแล้ว
+            </div>
+        {% elif s.evaluation.status == 'SUBMITTED' %}
+            <div class="badge badge-info text-white gap-1 shadow-sm p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                ประเมินแล้ว ({{ s.evaluation.total_score }}/75)
+            </div>
+        {% else %}
+            <div class="badge badge-ghost text-gray-500 gap-1 p-3 border-gray-300">
+                ยังไม่ประเมิน
+            </div>
+        {% endif %}
+    </td>
+    <td class="text-center">
+        <button class="btn btn-sm btn-primary text-white shadow-md hover:scale-105 transition-transform" 
+                hx-get="{% url 'get-evaluation-modal' s.id %}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+            {% if s.evaluation.status == 'DRAFT' or not s.evaluation %}
+                📝 ประเมิน
+            {% else %}
+                ✏️ แก้ไข/ดูผล
+            {% endif %}
+        </button>
+    </td>
+</tr>

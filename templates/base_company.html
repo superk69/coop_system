@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th" data-theme="corporate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ระบบสหกิจศึกษา - สำหรับสถานประกอบการ{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                    }
+                }
+            },
+            daisyui: {
+                // เลือกธีมที่ต้องการ (corporate = สุภาพ, business = เข้ม, light = ขาวสะอาด)
+                themes: ["corporate", "light", "business"], 
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar เล็กน้อยให้ดูดีขึ้น */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+        
+        /* Animation สำหรับ Modal */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.2s ease-out; }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-base-200 min-h-screen text-base-content font-sans antialiased">
+
+    {% if messages %}
+    <div class="toast toast-top toast-center z-[100]">
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %} shadow-lg text-white">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(() => {
+            const toasts = document.querySelectorAll('.toast');
+            toasts.forEach(t => t.style.display = 'none');
+        }, 3000);
+    </script>
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+
+    <div id="modal-container"></div>
+
+    <script>
+        // *** สำคัญ: ตั้งค่า CSRF Token ให้ HTMX ส่งไปกับทุก Request ***
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+
+        // จัดการ Error กรณี HTMX Request ล้มเหลว (Optional)
+        document.body.addEventListener('htmx:responseError', (event) => {
+            alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + event.detail.xhr.status);
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

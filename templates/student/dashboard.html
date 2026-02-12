@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load static %}
+{% load mathfilters %}
+
+{% block title %}Dashboard - นักศึกษา{% endblock %}
+
+{% block content %}
+<div class="space-y-8 fade-in">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-base-200 pb-6">
+        <div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                Dashboard <span class="text-primary">Student</span>
+            </h1>
+            <p class="text-gray-500 mt-2 text-base">ภาพรวมความก้าวหน้าการดำเนินงานสหกิจศึกษา</p>
+        </div>
+        
+        <div class="hidden lg:flex items-center gap-4 bg-white py-2 px-6 rounded-full shadow-sm border border-base-200">
+            <div class="text-right">
+                <div class="font-bold text-gray-700 text-sm">{{ user.get_full_name }}</div>
+                <div class="text-xs text-gray-400 font-mono">{{ user.username }}</div>
+            </div>
+            <div class="avatar online placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <span class="text-lg font-bold">{{ user.first_name.0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full bg-white p-6 rounded-2xl shadow-sm border border-base-200 overflow-x-auto">
+        <ul class="steps steps-horizontal lg:steps-horizontal w-full">
+            <li class="step {% if step >= 1 %}step-primary{% endif %}">
+                <span class="font-bold">อบรมเตรียมความพร้อม</span>
+            </li>
+            <li class="step {% if step >= 2 %}step-primary{% endif %}">
+                <span class="font-bold">สมัครงาน</span>
+            </li>
+            <li class="step {% if step >= 3 %}step-primary{% endif %}">
+                <span class="font-bold">ปฏิบัติงาน/ส่งรายงาน</span>
+            </li>
+            <li class="step {% if step >= 4 %}step-primary{% endif %}">
+                <span class="font-bold">ประเมินผล</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div class="card bg-white shadow-xl border border-base-200 h-full col-span-1">
+            <div class="card-body">
+                <h2 class="card-title text-gray-500 text-sm font-normal uppercase tracking-wide flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    ชั่วโมงเตรียมความพร้อม
+                </h2>
+                
+                <div class="py-4 text-center">
+                    <span class="font-mono text-6xl font-bold {% if training_hours >= 30 %}text-success{% else %}text-error{% endif %}">
+                        {{ training_hours }}
+                    </span>
+                    <span class="text-gray-400 text-xl font-medium">/ 30</span>
+                </div>
+
+                <div class="w-full">
+                    <progress class="progress w-full h-3 {% if training_hours >= 30 %}progress-success{% else %}progress-error{% endif %}" 
+                              value="{{ training_hours }}" max="30"></progress>
+                </div>
+
+                <div class="card-actions mt-auto pt-4">
+                    {% if training_hours < 30 %}
+                        <div role="alert" class="alert alert-warning text-sm py-2 bg-warning/10 text-warning-content border-warning/20">
+                            <span>ขาดอีก {{ 30|sub:training_hours }} ชม.</span>
+                        </div>
+                    {% else %}
+                        <div role="alert" class="alert alert-success text-sm py-2 bg-success/10 text-success-content border-success/20">
+                            <span>ผ่านเกณฑ์แล้ว</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-white shadow-xl border border-base-200 h-full flex flex-col justify-center {% if job_app.status == 'APPROVED' %}lg:col-span-1{% else %}lg:col-span-2{% endif %}">
+            <div class="card-body">
+                <h2 class="card-title text-gray-500 text-sm font-normal uppercase tracking-wide flex items-center gap-2 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    สถานะการสมัครงาน
+                </h2>
+
+                {% if job_app %}
+                <div class="flex flex-col {% if job_app.status != 'APPROVED' %}md:flex-row text-center md:text-left{% else %}text-center{% endif %} gap-6 items-center">
+                    
+                    {% if job_app.status == 'APPROVED' or job_app.status == 'COMPLETED' %}
+                        <div class="w-16 h-16 rounded-2xl bg-success/10 flex items-center justify-center shrink-0 text-success mx-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800 line-clamp-1" title="{{ job_app.company }}">{{ job_app.company }}</h3>
+                            <p class="text-gray-500 text-sm">ตำแหน่ง: <span class="text-primary font-medium">{{ job_app.position }}</span></p>
+                            <div class=""mt-2">
+                                <span class="badge badge-success badge-md mt-2 text-white">อนุมัติแล้ว</span>
+                                {% if job_app.status == 'APPROVED' %}
+                                <a href="{% url 'student-job' %}" class="btn btn-xs btn-error btn-outline text-error ml-2">ขอยกเลิก</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-800">{{ job_app.company }}</h3>
+                            <p class="text-gray-500">ตำแหน่ง: <span class="text-primary font-medium">{{ job_app.position }}</span></p>
+                            <div class="mt-2">
+                                {% if job_app.status == 'PENDING' %}
+                                    <span class="badge badge-warning text-white">รอการอนุมัติ</span>
+                                    <a href="{% url 'student-job' %}" class="btn btn-xs btn-ghost text-error ml-2">ขอยกเลิก</a>
+                                {% else %}
+                                    <span class="badge badge-error text-white">ไม่ผ่าน / ยกเลิก</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% else %}
+                <div class="flex flex-col items-center justify-center py-4 text-center">
+                    <div class="bg-base-200 p-3 rounded-full mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                    <p class="text-gray-500 text-sm">ยังไม่ได้สมัครงาน</p>
+                    {% if training_hours >= 30 %}
+                        <a href="{% url 'student-job' %}" class="btn btn-primary btn-sm mt-2">ค้นหางาน</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if job_app.status == 'APPROVED' or job_app.status == 'COMPLETED' %}
+        <div class="card bg-white shadow-xl border border-base-200 h-full col-span-1">
+            <div class="card-body">
+                <h2 class="card-title text-gray-500 text-sm font-normal uppercase tracking-wide flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    รายงานปฏิบัติงาน (Weekly)
+                </h2>
+                
+                <div class="py-4 text-center">
+                    <span class="font-mono text-6xl font-bold text-info">
+                        {{ report_count|default:"0" }}
+                    </span>
+                    <span class="text-gray-400 text-xl font-medium">ฉบับ</span>
+                    <p class="text-gray-500 text-sm mt-2">ที่ส่งเข้าระบบแล้ว</p>
+                </div>
+
+                <div class="w-full bg-base-200 rounded-full h-2.5 mb-4">
+                    <div class="bg-info h-2.5 rounded-full" style="width: {{ report_count|mul:6.25 }}%"></div> 
+                    </div>
+
+                <div class="card-actions mt-auto">
+                    <a href="{% url 'student-report' %}" class="btn btn-info btn-sm btn-block text-white shadow-md shadow-info/30 group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        ส่งรายงานประจำสัปดาห์
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+    .fade-in { animation: fadeIn 0.5s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

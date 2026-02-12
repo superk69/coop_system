@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+{% load mathfilters %}
+
+{% block title %}ส่งรายงานปฏิบัติงาน{% endblock %}
+
+{% block content %}
+<div class="space-y-6 fade-in">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-base-200 pb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                รายงานปฏิบัติงาน
+            </h1>
+            <p class="text-gray-500 mt-2 text-base">ส่งบันทึกการปฏิบัติงานรายสัปดาห์ (Weekly Report) และติดตามสถานะการตรวจ</p>
+        </div>
+        <div class="hidden lg:flex items-center gap-4 bg-white py-2 px-6 rounded-full shadow-sm border border-base-200">
+            <div class="text-right">
+                <div class="font-bold text-gray-700 text-sm">{{ user.get_full_name }}</div>
+                <div class="text-xs text-gray-400 font-mono">{{ user.username }}</div>
+            </div>
+            <div class="avatar online placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-10 ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <span class="text-lg font-bold">{{ user.first_name.0 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="lg:col-span-1 space-y-6">
+            <div class="card bg-white shadow-xl border border-base-200 sticky top-24">
+                <div class="card-body items-center text-center">
+                    <h2 class="card-title text-gray-500 text-sm font-normal uppercase tracking-wide">
+                        รายงานที่ส่งแล้ว (อนุมัติแล้ว)
+                    </h2>
+                    
+                    <div class="py-6">
+                        <div class="relative inline-flex items-center justify-center">
+                            <div class="radial-progress text-primary/10" style="--value:100; --size:10rem;"></div>
+                            <div class="radial-progress text-info" 
+                                 style="--value:{% widthratio reports.count 16 100 %}; --size:10rem; --thickness: 1rem;">
+                                <div class="text-center text-gray-800">
+                                    <span class="text-5xl font-bold font-mono block">{{ reports.count }}</span>
+                                    <span class="text-xs text-gray-400 font-bold uppercase">ฉบับ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-full space-y-2">
+                        <div class="flex justify-between text-sm font-medium">
+                            <span class="text-gray-500">ความคืบหน้า (โดยประมาณ)</span>
+                            <span class="text-gray-800">{{ reports.count }} / 16 สัปดาห์</span>
+                        </div>
+                        <progress class="progress w-full h-2 bg-base-200 progress-info" 
+                                  value="{{ reports.count }}" max="16"></progress>
+                    </div>
+
+                    <div class="card-actions w-full mt-6">
+                        <div class="alert alert-info py-3 text-sm shadow-sm bg-blue-50 text-blue-800 border-blue-200">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>ส่งสม่ำเสมอทุกสัปดาห์</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+            
+            {% if job.status != 'COMPLETED' and job.status != 'CANCELLED' %}
+            <div class="card bg-white shadow-lg border border-base-200">
+                <div class="card-body p-6">
+                    <h2 class="card-title text-lg text-gray-700 flex items-center gap-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    บันทึกรายงานสัปดาห์ที่ <span class="font-bold text-primary">{{ next_week_number }}</span>
+                    </h2>
+                
+                    <form hx-post="{% url 'student-report' %}" hx-target="body" hx-vals='{"week_number": "{{ next_week_number }}" }' enctype="multipart/form-data" class="space-y-4">
+                    {% csrf_token %}
+                    
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <div class="form-control w-full md:col-span-2">
+                                <label class="label"><span class="label-text font-bold">1. สรุปงานที่ปฏิบัติ (Work Summary)</span></label>
+                                {{ form.work_summary }} {% if form.work_summary.errors %}
+                                <span class="text-error text-sm mt-1">{{ form.work_summary.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-control w-full md:col-span-2">
+                                <label class="label"><span class="label-text font-bold">2. ปัญหาที่พบ (Problems Found)</span></label>
+                                {{ form.problems }}
+                            </div>
+                            <div class="form-control w-full md:col-span-2">
+                                <label class="label"><span class="label-text font-bold">3. สิ่งที่ได้เรียนรู้ (Knowledge Gained)</span></label>
+                                {{ form.knowledge_gained }}
+                            </div>
+
+                            <div class="form-control w-full md:col-span-2">
+                                <label class="label"><span class="label-text font-bold">4. ข้อเสนอแนะจากพี่เลี้ยง (Supervisor Feedback)</span></label>
+                                {{ form.supervisor_feedback  }}
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button type="submit" class="btn btn-primary text-white shadow-md gap-2 w-full md:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                                บันทึกรายงาน
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card bg-white shadow-lg border border-base-200">
+                <div class="card-body p-0">
+                    <div class="p-5 border-b border-base-200 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-700 text-lg">ประวัติการส่งรายงาน</h3>
+                        <span class="badge badge-ghost">{{ reports.count }} รายการ</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full align-middle">
+                            <thead class="bg-base-200 text-gray-600 hidden md:table-header-group">
+                                <tr>
+                                    <th class="w-16 text-center">Week</th>
+                                    <th>สรุปงานที่ปฏิบัติ</th>
+                                    <th class="text-center">สถานะ</th>
+                                    <th class="text-center w-20">ดู</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                {% for report in reports %}
+                            <tr class="hover group flex md:table-row flex-col border-b md:border-none py-2 px-4 md:p-0">
+                                <td class="text-center md:table-cell hidden font-bold text-primary text-2xl">{{ report.week_number }}</td>
+                                <td class="md:table-cell py-2 md:py-4">{{ report.work_summary|truncatechars:60 }}</td>
+                                <td class="text-left md:text-center py-2 md:py-4">
+                                    <div class="flex items-center md:justify-center gap-2">
+                                        <span class="md:hidden font-bold text-xs text-gray-500">สถานะ:</span>
+                                        {% if report.status == 'ACKNOWLEDGED' %}
+                                            <div class="badge badge-success gap-1 text-white shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                                รับรอง
+                                            </div>
+                                        {% else %}
+                                            <div class="badge badge-warning gap-1 text-warning-content shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                                                ส่งแล้ว
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                
+                                <td class="text-left md:text-center py-2 md:py-4">
+                                    <button hx-get="{% url 'report-detail-modal' report.id %}"
+                                            hx-target="#modal_container"
+                                            hx-swap="innerHTML"
+                                            class="btn btn-sm btn-ghost btn-outline text-info w-full md:w-auto hover:bg-info hover:text-white transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                        <span class="md:hidden lg:inline ml-1">View</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="py-10 text-center">
+                                        <div class="flex flex-col items-center justify-center text-gray-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                            <span>ยังไม่มีประวัติการส่งรายงาน</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="report-modal-content"></div>
+
+<style>
+    .fade-in { animation: fadeIn 0.5s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+{% endblock %}

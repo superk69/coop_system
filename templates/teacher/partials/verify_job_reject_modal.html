@@ -1,0 +1,72 @@
+<div id="verify_job_reject_modal" class="modal modal-open z-50 font-sans">
+    
+    <div class="modal-box w-11/12 max-w-md p-0 bg-base-100 shadow-2xl rounded-xl relative overflow-hidden">
+        
+        <div class="bg-error text-error-content px-6 py-4 flex justify-between items-center shadow-md">
+            <h3 class="font-bold text-lg flex items-center gap-2 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                ยืนยันการปฏิเสธคำร้อง
+            </h3>
+            <button type="button" onclick="closeModal()" class="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20">
+                ✕
+            </button>
+        </div>
+
+        <div class="p-6 space-y-5">
+            
+            <div role="alert" class="alert alert-error/10 border border-error/20 text-sm shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-error shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <div class="flex flex-col gap-1 w-full">
+                    <span class="font-bold text-error-content/80">คุณกำลังจะปฏิเสธคำร้องของ:</span>
+                    <div class="text-gray-800 font-bold ml-1">{{ job.student.user.get_full_name }}</div>
+                    <div class="text-gray-600 text-xs ml-1">บริษัท: <strong>{{ job.company }}</strong></div>
+                </div>
+            </div>
+
+            <form hx-post="{% url 'reject-job' job.id %}" 
+                  hx-target="#job-list-container"
+                  hx-on:htmx:after-request="closeModal()"
+                  class="flex flex-col gap-2">
+                {% csrf_token %}
+                
+                <div class="form-control">
+                    <label class="label pt-0">
+                        <span class="label-text font-bold text-gray-700">
+                            กรุณาระบุเหตุผล (แจ้งให้นักศึกษาทราบ) <span class="text-error">*</span>
+                        </span>
+                    </label>
+                    <textarea name="teacher_note" 
+                              class="textarea textarea-bordered textarea-error w-full h-32 focus:ring-2 ring-error/20" 
+                              placeholder="เช่น บริษัทไม่ตรงสายงาน, ระยะเวลาฝึกงานไม่ครบตามกำหนด..."
+                              required></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-base-200">
+                    <button type="button" onclick="closeModal()" class="btn btn-ghost text-gray-500 font-normal hover:bg-gray-200">
+                        ยกเลิก
+                    </button>
+                    <button type="submit" class="btn btn-error text-white shadow-md px-6 gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        ยืนยันการปฏิเสธ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop bg-black/60 fixed inset-0 -z-10" onclick="closeModal()"></div>
+</div>
+
+<script>
+    if (typeof closeModal !== 'function') {
+        function closeModal() {
+            const container = document.getElementById('modal-container');
+            if (container) container.innerHTML = '';
+            
+            const modal = document.getElementById('verify_job_reject_modal');
+            if (modal) modal.remove();
+        }
+    }
+</script>

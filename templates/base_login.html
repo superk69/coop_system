@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th" data-theme="winter"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ระบบสหกิจศึกษา{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+        
+        // Config ฟอนต์ให้ Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="font-sans text-base-content bg-base-200" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    {% if messages %}
+        <div class="toast toast-top toast-end z-50">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %} shadow-lg">
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="drawer lg:drawer-open">
+        <div class="drawer-content flex flex-col">
+            <main class="p-4 md:p-6 lg:p-8 min-h-screen">
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div> 
+        
+    </div>
+
+    <div id="modal_container" class="relative z-[9999]"></div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

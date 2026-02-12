@@ -1,0 +1,78 @@
+<table class="table table-zebra w-full align-middle">
+    <thead class="bg-base-200 text-gray-700 text-sm">
+        <tr>
+            <th class="w-12 text-center">#</th>
+            <th>บริษัท / ปีการศึกษา</th>
+            <th>ผู้ถือบัญชี (ตำแหน่ง)</th>
+            <th>เบอร์โทร</th>
+            <th>บัญชีผู้ใช้ (Username)</th>
+            <th class="text-center w-36">จัดการ</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        {% for account in profiles %}
+        <tr class="hover transition-colors border-b border-base-100 last:border-none">
+            <th class="text-center text-gray-400 font-mono">{{ forloop.counter }}</th>
+            
+            <td>
+                <div class="font-bold text-primary text-base">{{ account.company.name }}</div>
+                <div class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                    <span class="badge badge-ghost badge-xs font-normal">ปีการศึกษา {{ account.academic_year }}</span>
+                </div>
+            </td>
+
+            <td class="text-gray-600">
+                {{ account.position|default:"-" }}
+            </td>
+
+            <td class="text-gray-600">
+                {{ account.phone|default:"-" }}
+            </td>
+
+            <td>
+                <div class="flex flex-col items-start gap-1">
+                    <span class="font-mono font-bold bg-base-200 px-2 py-1 rounded text-gray-800 border border-base-300">
+                        {{ account.user.username }}
+                    </span>
+                    <span class="text-[10px] text-gray-400 italic">(Reset รหัสผ่านหากลืม)</span>
+                </div>
+            </td>
+
+
+            <td class="text-center">
+                <div class="join shadow-sm border border-base-300 rounded-lg">
+                    <button class="join-item btn btn-sm btn-ghost hover:bg-warning/10 hover:text-warning tooltip"
+                            data-tip="แก้ไข"
+                            hx-get="{% url 'get-account-modal-edit' account.id %}"
+                            hx-target="#modal-container"
+                            hx-swap="innerHTML">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                    <button class="join-item btn btn-sm btn-ghost hover:bg-error/10 hover:text-error tooltip"
+                            data-tip="ลบ"
+                            hx-delete="{% url 'delete-account' account.id %}"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                            hx-target="#account-list-container"
+                            hx-confirm="ยืนยันการลบบัญชี {{ account.username }}?">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center py-10 text-gray-400">
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span>ยังไม่มีบัญชีบริษัทในระบบ</span>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
