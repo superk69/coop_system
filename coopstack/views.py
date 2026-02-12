@@ -7,12 +7,11 @@ from django.contrib import messages
 from django.db.models import Count, Q, Avg, Sum
 from django.db import transaction
 from django.utils import timezone
-from django.http import HttpResponse
-from django.http import HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, FileResponse
 from datetime import date, timedelta, datetime
 from django.contrib.auth.models import User
 import random, string
-
+from .utils import generate_coop_docx
 
 # Imports จากไฟล์ภายใน App ของเรา
 from .models import (
@@ -137,6 +136,32 @@ class AnnouncementCreateView(LoginRequiredMixin, View):
 # ==============================================================================
 # 1. Student System
 # ==============================================================================
+
+def download_application_form(request, job_id):
+    # 1. ดึงข้อมูล
+    job_app = get_object_or_404(JobApplication, id=job_id)
+    
+    # 2. ตรวจสอบสิทธิ์ (เหมือนเดิม)
+    if job_app.student.user != request.user and not request.user.is_staff:
+        return HttpResponseForbidden("คุณไม่มีสิทธิ์")
+    
+    if job_app.status != 'APPROVED':
+        return HttpResponseForbidden("ต้องผ่านการอนุมัติก่อน")
+
+    # 3. สร้างไฟล์ Word
+    docx_buffer = generate_coop_docx(job_app)
+    
+    # 4. ส่งไฟล์กลับ (Content-Type สำหรับ .docx)
+    filename = f"coop_form_{job_app.student.student_code}.docx"
+    response = FileResponse(
+        docx_buffer, 
+        as_attachment=True, 
+        filename=filename
+    )
+    # MIME Type ของ docx
+    response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    
+    return response
 
 class StudentBaseView(LoginRequiredMixin, View):
     """ Base Class สำหรับตรวจสอบว่าเป็นนักศึกษาจริงไหม """

@@ -43,6 +43,7 @@ urlpatterns = [
     # ===========================================
     # 3. Student System
     # ===========================================
+    path('download-form/<int:job_id>/', views.download_application_form, name='download-coop-form'),
     path('student/dashboard/', views.StudentDashboardView.as_view(), name='student-dashboard'),
     #path('student/profile/', views.StudentProfileView.as_view(), name='student-profile'),
     # Path หน้าข่าวสาร
