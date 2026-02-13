@@ -54,7 +54,7 @@ class AllowedStudent(models.Model):
     is_registered = models.BooleanField(default=False, verbose_name="ลงทะเบียนแล้ว")
 
     def __str__(self):
-        return f"{self.student_code} - {self.first_name} {self.last_name}"
+        return f"{self.student_code} - {self.firstname} {self.lastname}"
 
 
 # ==========================================
