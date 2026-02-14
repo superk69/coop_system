@@ -9,8 +9,12 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-y54q*yjh=_7jydp92i##5zkv(#n2qq2$o0ngogjsh-%@e=da)m"
+#SECRET_KEY = "django-insecure-y54q*yjh=_7jydp92i##5zkv(#n2qq2$o0ngogjsh-%@e=da)m"
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-y54q*yjh=_7jydp92i##5zkv(#n2qq2$o0ngogjsh-%@e=da)m')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# ต้องแปลง string 'True'/'False' เป็น boolean
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 
 # Application definition
@@ -44,6 +49,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -84,6 +90,16 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.getenv('DB_NAME'),
+#        'USER': os.getenv('DB_USER'),
+#        'PASSWORD': os.getenv('DB_PASSWORD'),
+#        'HOST': os.getenv('DB_HOST', 'localhost'),
+#        'PORT': os.getenv('DB_PORT', '5432'),
+#    }
+#}
 
 AUTH_USER_MODEL = "coopstack.User"
 ALLOWED_EMAIL_DOMAINS = ["ubu.ac.th"]  # เพิ่มโดเมนอีเมลที่อนุญาตที่นี่
@@ -123,10 +139,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static'] # ชี้ไปที่โฟลเดอร์ static
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# เปิดใช้งาน WhiteNoise Compression
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Media Files (ไฟล์ที่ User อัปโหลด เช่น PDF, รูปโปรไฟล์)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -134,3 +154,24 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+if not DEBUG:
+    # บังคับใช้ HTTPS (ถ้า Server มี SSL Certificate)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # ป้องกัน Browser เดา Content Type
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    
+    # ป้องกันการรัน Script บน Browser รุ่นเก่า (XSS)
+    SECURE_BROWSER_XSS_FILTER = True
+    
+    # HTTP Strict Transport Security (HSTS)
+    SECURE_HSTS_SECONDS = 31536000  # 1 ปี
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # ตั้งค่า CSRF Trusted Origins (เปลี่ยนเป็น Domain ของคุณ)
+    CSRF_TRUSTED_ORIGINS = ['https://yourdomain.com']

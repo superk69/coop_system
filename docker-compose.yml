@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # 1. Django Container
+  web:
+    build: .
+    command: gunicorn coopV2.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./app:/app              # (Optional) Bind code เพื่อแก้แล้วเปลี่ยนเลย (สำหรับ Dev)
+      - ./staticfiles:/app/static  # Bind โฟลเดอร์ Static ไปที่ Host
+      - ./media:/app/media      # Bind โฟลเดอร์ Media ไปที่ Host
+    expose:
+      - 8000
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: always
+
+  # 2. Database Container (PostgreSQL)
+  db:
+    image: postgres:15
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data # Bind ข้อมูล DB ออกมาที่ Host (โฟลเดอร์ pgdata)
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    restart: always
+
+  # 3. Nginx Container
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"   # HTTP
+      - "443:443" # HTTPS
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./staticfiles:/app/staticfiles:ro
+      - ./media:/app/media:ro
+    depends_on:
+      - web
+    restart: always
