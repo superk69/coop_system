@@ -175,4 +175,4 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 
     # ตั้งค่า CSRF Trusted Origins (เปลี่ยนเป็น Domain ของคุณ)
-    CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://127.0.0.1']
+    CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://127.0.0.1', 'https://coopdssi.ubu.ac.th']  # ⚠️ แก้เป็นโดเมนจริงของคุณ
